@@ -40,6 +40,11 @@ func ReadBytesWithDynamicLength(f *os.File, offset int64, headerLength int64) []
 	return returnValue
 }
 
+func GetBytesWithDynamicLength(value []byte, headerLength int) []byte {
+	header := Int32ToByteArray(headerLength, uint32(len(value)))
+	return append(header, value...)
+}
+
 func ReadBytesWithOffset(f *os.File, offset int64, length int64) []byte {
 	f.Seek(offset, 1)
 	returnValue, err := ReadBytes(f, int(length))
@@ -53,6 +58,17 @@ func PadByteArray(input []byte) []byte {
 		output = append(output, byte(0), b)
 	}
 	return output
+}
+
+func PadForLength(input []byte, length int) []byte {
+	for {
+		if len(input) < length {
+			input = append([]byte{0}, input...)
+		} else {
+			break
+		}
+	}
+	return input
 }
 
 func UnPadByteArray(input []byte) []byte {

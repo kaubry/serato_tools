@@ -6,16 +6,16 @@ import (
 	"path/filepath"
 )
 
+const version = "'Vrsn: 81.0/Serato ScratchLive Crate"
+
 type Crate struct {
 	vrsn    []byte //Version
-	osrt    []byte //Sorting
-	tvcn    []byte //Column Name
-	brev    []byte // ???
+	osrt    []byte //Sorting (always int 19 or 25)
+	tvcn    []byte //Default sorting column name (song, artist, etc...). Default #
+	brev    []byte // ??? Always 5 bytes 0 0 0 1 0, maybe a delimiter
 	columns []Column
 	tracks  []Track
 }
-
-
 
 func NewCrate(f *os.File) *Crate {
 	crate := Crate{
@@ -25,6 +25,18 @@ func NewCrate(f *os.File) *Crate {
 		brev:    ReadBytesWithOffset(f, 4, 5),
 		columns: readColumns(f),
 		tracks:  readTracks(f),
+	}
+	return &crate
+}
+
+func NewEmptyCrate() *Crate {
+	crate := Crate{
+		vrsn:    PadForLength(PadByteArray([]byte(version)), 60),
+		osrt:    Int32ToByteArray(4, 19),
+		tvcn:    GetBytesWithDynamicLength(PadByteArray([]byte("#")), 4),
+		brev:    []byte{0, 0, 0, 1, 0},
+		columns: make([]Column, 0),
+		tracks:  make([]Track, 0),
 	}
 	return &crate
 }
@@ -89,4 +101,36 @@ func (c *Crate) ContainsTrack(t Track) bool {
 		}
 	}
 	return false
+}
+
+func (c *Crate) GetCrateBytes() []byte {
+	var output []byte
+	//Version
+	output = append(output, []byte("vrsn")...)
+	output = append(output, c.vrsn...)
+	//Sorting
+	output = append(output, []byte("osrt")...)
+	output = append(output, c.osrt...)
+	//Column Sort
+	output = append(output, []byte("tvcn")...)
+	output = append(output, c.tvcn...)
+	//Brev
+	output = append(output, []byte("brev")...)
+	output = append(output, c.brev...)
+
+	//Columns
+	for _, col := range c.columns {
+		output = append(output, col.GetColumnBytes()...)
+	}
+
+	//Tracks
+	for _, track := range c.tracks {
+		output = append(output, track.GetTrackBytes()...)
+	}
+
+	return output
+}
+
+func (c Crate) String() string {
+	return fmt.Sprintf("Vrsn: %s\n Osrt: %d\n Tvcn: %s", string(UnPadByteArray(c.vrsn)), ReadInt32(c.osrt), string(UnPadByteArray(c.tvcn)))
 }

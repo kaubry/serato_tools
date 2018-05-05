@@ -10,9 +10,8 @@ func main() {
 	//f, _ := os.Open("./o.mp3")
 	//addTrack(f)
 	//readCrate("./ALFA18 Fri.crate")
-	//readCrate("./DJ Yuma.crate")
-	//readCrate("./Test.crate")
-	readCrate("./SubCrate2.crate")
+	readCrate("./Test.crate")
+	//readCrate("./SubCrate4.crate")
 }
 
 func check(e error) {
@@ -26,6 +25,8 @@ func readCrate(path string) {
 	check(err)
 	crate := NewCrate(f)
 	//track := crate.TrackList()[0]
+
+	fmt.Printf("'%s\n", crate)
 	for _, c := range crate.columns {
 		fmt.Printf("%s\n", c)
 	}

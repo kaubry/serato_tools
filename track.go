@@ -38,6 +38,18 @@ func (track *Track) CleanTrackName() []byte {
 	return UnPadByteArray(track.ptrk)
 }
 
+func (track *Track) GetTrackBytes() []byte {
+	var output []byte
+	output = append(output, []byte("otrk")...)
+	//otrk := Int32ToByteArray(4, uint32(len(track.ptrk) + 8))
+	output = append(output, track.otrk...)
+
+	output = append(output, []byte("ptrk")...)
+	output = append(output, GetBytesWithDynamicLength(track.ptrk, 4)...)
+
+	return output
+}
+
 func (track Track) String() string {
 	return fmt.Sprintf("otrk: %d  //  cleaned ptrk: %s", ReadInt32(track.otrk), string(track.CleanTrackName()))
 }

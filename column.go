@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"fmt"
+	"bytes"
 )
 
 type ColumnName int
@@ -57,9 +58,17 @@ func (c ColumnName) String() string {
 }
 
 type Column struct {
-	ovct []byte // total size of column bytes data (without ovct)
-	tvcn []byte //Column Name (4 + 4 + dynamic length)
+	ovct []byte // Total size of column bytes data (without ovct)
+	tvcn []byte // Column Name (4 + 4 + dynamic length)
 	tvcw []byte // Column Width (in pixel ???) (4 + 4 + dynamic length) // 0 padded string
+}
+
+func NewColumn(name string, width int32) Column {
+	c := Column{
+		tvcn: PadByteArray([]byte(name)),
+		tvcw: PadByteArray([]byte(string(width))),
+	}
+	return c
 }
 
 func readColumn(f *os.File) Column {
@@ -68,6 +77,25 @@ func readColumn(f *os.File) Column {
 		tvcn: ReadBytesWithDynamicLength(f, 4, 4),
 		tvcw: ReadBytesWithDynamicLength(f, 4, 4),
 	}
+}
+
+func (c *Column) Equals(c2 Column) bool {
+	return bytes.Equal(c.tvcn, c2.tvcn) && bytes.Equal(c.tvcw, c2.tvcw)
+}
+
+func (c *Column) GetColumnBytes() []byte {
+	var output []byte
+	output = append(output, []byte("ovct")...)
+	length := len(c.tvcn) + len(c.tvcw) + 16
+	output = append(output, Int32ToByteArray(4, uint32(length))...)
+
+	output = append(output, []byte("tvcn")...)
+	output = append(output, GetBytesWithDynamicLength(c.tvcn, 4)...)
+
+	output = append(output, []byte("tvcw")...)
+	output = append(output, GetBytesWithDynamicLength(c.tvcw, 4)...)
+
+	return output
 }
 
 func (c Column) String() string {
