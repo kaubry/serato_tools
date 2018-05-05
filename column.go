@@ -63,9 +63,9 @@ type Column struct {
 	tvcw []byte // Column Width (in pixel ???) (4 + 4 + dynamic length) // 0 padded string
 }
 
-func NewColumn(name string, width int32) Column {
+func NewColumn(name ColumnName, width int32) Column {
 	c := Column{
-		tvcn: PadByteArray([]byte(name)),
+		tvcn: PadByteArray([]byte(string(name))),
 		tvcw: PadByteArray([]byte(string(width))),
 	}
 	return c
@@ -80,7 +80,7 @@ func readColumn(f *os.File) Column {
 }
 
 func (c *Column) Equals(c2 Column) bool {
-	return bytes.Equal(c.tvcn, c2.tvcn) && bytes.Equal(c.tvcw, c2.tvcw)
+	return bytes.Equal(c.tvcn, c2.tvcn)
 }
 
 func (c *Column) GetColumnBytes() []byte {

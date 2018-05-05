@@ -86,6 +86,15 @@ func (c *Crate) AddTrack(f *os.File) {
 	}
 }
 
+func (c *Crate) AddColumn(name ColumnName) {
+	column := NewColumn(name, 0)
+	if !c.ContainsColumn(column) {
+		c.columns = append(c.columns, column)
+	} else {
+		fmt.Printf("Column already in crate !!!")
+	}
+}
+
 func (c *Crate) TrackList() []string {
 	var output []string
 	for _, track := range c.tracks {
@@ -97,6 +106,15 @@ func (c *Crate) TrackList() []string {
 func (c *Crate) ContainsTrack(t Track) bool {
 	for _, track := range c.tracks {
 		if track.Equals(t) {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Crate) ContainsColumn(col Column) bool {
+	for _, column := range c.columns {
+		if column.Equals(col) {
 			return true
 		}
 	}
