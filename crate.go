@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-const version = "'Vrsn: 81.0/Serato ScratchLive Crate"
+const version = "81.0/Serato ScratchLive Crate"
 
 type Crate struct {
 	vrsn    []byte //Version
@@ -29,7 +29,7 @@ func NewCrate(f *os.File) *Crate {
 	return &crate
 }
 
-func NewEmptyCrate() *Crate {
+func NewEmptyCrate(columnNames []ColumnName) *Crate {
 	crate := Crate{
 		vrsn:    PadForLength(PadByteArray([]byte(version)), 60),
 		osrt:    Int32ToByteArray(4, 19),
@@ -37,6 +37,10 @@ func NewEmptyCrate() *Crate {
 		brev:    []byte{0, 0, 0, 1, 0},
 		columns: make([]Column, 0),
 		tracks:  make([]Track, 0),
+	}
+
+	for _, c := range columnNames {
+		crate.AddColumn(c)
 	}
 	return &crate
 }

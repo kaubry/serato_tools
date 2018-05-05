@@ -4,12 +4,14 @@ import (
 	"os"
 	"fmt"
 	"bytes"
+	"strconv"
 )
 
 type ColumnName int
 
 const (
-	added       ColumnName = iota + 1
+	song        ColumnName = iota
+	added
 	album
 	artist
 	bitrate
@@ -33,6 +35,7 @@ const (
 
 func (c ColumnName) String() string {
 	names := [...]string{
+		"song",
 		"added",
 		"album",
 		"artist",
@@ -63,10 +66,10 @@ type Column struct {
 	tvcw []byte // Column Width (in pixel ???) (4 + 4 + dynamic length) // 0 padded string
 }
 
-func NewColumn(name ColumnName, width int32) Column {
+func NewColumn(name ColumnName, width int) Column {
 	c := Column{
-		tvcn: PadByteArray([]byte(string(name))),
-		tvcw: PadByteArray([]byte(string(width))),
+		tvcn: PadByteArray([]byte(name.String())),
+		tvcw: PadByteArray([]byte(strconv.Itoa(width))),
 	}
 	return c
 }
