@@ -27,10 +27,10 @@ type Track struct {
 
 func NewCrate(f *os.File) *Crate {
 	crate := Crate{
-		vrsn:    readBytesWithOffset(f, 4, 60),
-		osrt:    readBytesWithOffset(f, 4, 4),
-		tvcn:    readBytesWithDynamicLength(f, 4, 4),
-		brev:    readBytesWithOffset(f, 4, 5),
+		vrsn:    ReadBytesWithOffset(f, 4, 60),
+		osrt:    ReadBytesWithOffset(f, 4, 4),
+		tvcn:    ReadBytesWithDynamicLength(f, 4, 4),
+		brev:    ReadBytesWithOffset(f, 4, 5),
 		columns: readColumns(f),
 		tracks:  readTracks(f),
 	}
@@ -39,7 +39,7 @@ func NewCrate(f *os.File) *Crate {
 
 func readColumns(f *os.File) []Column {
 	var columns []Column
-	for string(readBytesWithOffset(f, 0, 4)) == "ovct" {
+	for string(ReadBytesWithOffset(f, 0, 4)) == "ovct" {
 		f.Seek(-4, 1)
 		columns = append(columns, readColumn(f))
 	}
@@ -49,9 +49,9 @@ func readColumns(f *os.File) []Column {
 
 func readColumn(f *os.File) Column {
 	return Column{
-		ovct: readBytesWithOffset(f, 4, 4),
-		tvcn: readBytesWithDynamicLength(f, 4, 4),
-		tvcw: readBytesWithDynamicLength(f, 4, 4),
+		ovct: ReadBytesWithOffset(f, 4, 4),
+		tvcn: ReadBytesWithDynamicLength(f, 4, 4),
+		tvcw: ReadBytesWithDynamicLength(f, 4, 4),
 	}
 }
 
@@ -72,24 +72,23 @@ func readTracks(f *os.File) []Track {
 
 func readTrack(f *os.File) Track {
 	return Track{
-		otrk: readBytesWithOffset(f, 4, 4),
-		ptrk: readBytesWithDynamicLength(f, 4, 4),
+		otrk: ReadBytesWithOffset(f, 4, 4),
+		ptrk: ReadBytesWithDynamicLength(f, 4, 4),
 	}
 }
 
-func readBytesWithDynamicLength(f *os.File, offset int64, headerLength int64) []byte {
-	f.Seek(offset, 1)
-	l, err := ReadBytes(f, int(headerLength))
-	check(err)
-	length := ReadInt32(l)
-	returnValue, err2 := ReadBytes(f, int(length))
-	check(err2)
-	return returnValue
+func (c *Crate) ListTracks() {
+	for _, track := range c.tracks {
+		fmt.Printf("length: %d / %d, %s\n", ReadInt32(track.otrk), len(track.ptrk)+8, string(cleanTrackName(track.ptrk)))
+	}
 }
 
-func readBytesWithOffset(f *os.File, offset int64, length int64) []byte {
-	f.Seek(offset, 1)
-	returnValue, err := ReadBytes(f, int(length))
-	check(err)
-	return returnValue
+func cleanTrackName(track []byte) []byte {
+	var t []byte
+	for _, b := range track {
+		if b != byte(0) {
+			t = append(t, b)
+		}
+	}
+	return t
 }
