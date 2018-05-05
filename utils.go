@@ -24,6 +24,12 @@ func ReadInt32(data []byte) (ret int32) {
 	return
 }
 
+func Int32ToByteArray(arrayLength int, number uint32) []byte {
+	bs := make([]byte, arrayLength)
+	binary.BigEndian.PutUint32(bs, number)
+	return bs
+}
+
 func ReadBytesWithDynamicLength(f *os.File, offset int64, headerLength int64) []byte {
 	f.Seek(offset, 1)
 	l, err := ReadBytes(f, int(headerLength))
@@ -39,6 +45,28 @@ func ReadBytesWithOffset(f *os.File, offset int64, length int64) []byte {
 	returnValue, err := ReadBytes(f, int(length))
 	check(err)
 	return returnValue
+}
+
+func PadByteArray(input []byte) []byte {
+	var output []byte
+	for _, b := range input {
+		output = append(output, byte(0), b)
+	}
+	return output
+}
+
+func UnPadByteArray(input []byte) []byte {
+	var t []byte
+	for _, b := range input {
+		if b != byte(0) {
+			t = append(t, b)
+		}
+	}
+	return t
+}
+
+func StringToPaddedByteArray(s string) []byte {
+	return PadByteArray([]byte(s))
 }
 
 func listFiles() {
