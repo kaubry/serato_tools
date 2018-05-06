@@ -85,16 +85,22 @@ func StringToPaddedByteArray(s string) []byte {
 	return PadByteArray([]byte(s))
 }
 
-func listFiles() {
-	searchDir := "/Users/kevin/Desktop/test-mp3"
-
-	fileList := []string{}
-	filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
-		fileList = append(fileList, path)
+func ListFiles(dir string) map[string][]string {
+	output := make(map[string][]string)
+	filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
+		if f.IsDir() {
+			if output[path] == nil {
+				output[path] = []string{}
+			}
+		} else if filepath.Ext(path) == ".mp3" {
+			key := filepath.Dir(path)
+			if output[key] == nil {
+				output[key] = []string{}
+			}
+			output[key] = append(output[key], path)
+		}
 		return nil
 	})
 
-	for _, file := range fileList {
-		fmt.Println(file)
-	}
+	return output
 }
