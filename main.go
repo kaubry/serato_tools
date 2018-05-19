@@ -3,13 +3,23 @@ package main
 import (
 	"os"
 	"fmt"
+	"strings"
+	"path/filepath"
 )
 
+const volumePath = "/Volumes/128Go SD"
+const musicPath = "/GDrive/DJ/"
+
 func main() {
-	createCrate()
+	files := ListFiles("/Volumes/128Go SD/GDrive/DJ")
+	//for k,v := range files {
+	//	fmt.Printf("dir: %s  //   val:%s\n", k, v)
+	//}
+	createCrates(files)
+	//createCrate()
 	//readCrate("./Kevin.crate")
 	//fmt.Printf("\n")
-	readCrate("./Kevin.crate")
+	//readCrate("./Kevin.crate")
 	//listFiles()
 	//f, _ := os.Open("./o.mp3")
 	//addTrack(f)
@@ -22,6 +32,40 @@ func check(e error) {
 	if e != nil {
 		panic(e)
 	}
+}
+
+func getSeratoDir() string{
+	return volumePath+"/_Serato_/"
+
+}
+
+func createCrates(files map[string][]string) {
+	for key, tracks := range files {
+
+		//info, err := os.Stat(crateFilePath)
+		createCrate(getCratePath(key), GetDefaultColumn(), tracks...)
+		//crateFile, err := os.Create()
+		//if err != nil {
+		//	log.Printf("Can't create file %s", file)
+		//}
+
+	}
+}
+
+func getCratePath(file string) string {
+	newPath := removeVolumeFromPath(file)
+	newPath = removeMusicPathFromPath(newPath)
+	newPath = strings.Replace(newPath, "/", "%%", -1)
+	newPath = strings.Replace(newPath, "-", "_",  -1)
+	return filepath.Join(getSeratoDir(), "Subcrates",  "DJ Yuma%%"+newPath+".crate")
+}
+
+func removeMusicPathFromPath(file string) string {
+	return strings.Replace(file, musicPath, "", 1)
+}
+
+func removeVolumeFromPath(file string) string {
+	return strings.Replace(file, volumePath, "", 1)
 }
 
 func readCrate(path string) {
@@ -47,21 +91,30 @@ func readCrate(path string) {
 	//fmt.Printf("%d bytes: %s\n", len(display), string(display))
 }
 
-func createCrate() {
-	crate := NewEmptyCrate([]ColumnName{song, artist, length})
-	f, _ := os.Open("/Users/kevin/Downloads/Haila - De Donde Vengo.mp3")
-	crate.AddTrack(f)
-	f, _ = os.Open("/Users/kevin/Downloads/Issac Delgado - Toro Mata.mp3")
-	crate.AddTrack(f)
-	f, _ = os.Open("/Users/kevin/Downloads/Johnny Polanco Y Su Conjunto Amistad - Happy Birthday.mp3")
-	crate.AddTrack(f)
-	writeToFile("./Kevin.crate", crate.GetCrateBytes())
+//func createCrateWithTracks(path string, columns []ColumnName, files []string) {
+//	crate
+//}
+
+func createCrate(path string, columns []ColumnName, tracks ...string) {
+	crate := NewEmptyCrate(columns)
+	for _, t := range tracks {
+		//f, err := os.Open(t)
+		//if err != nil {
+		//	log.Printf("File %s is not a track", t)
+		//}
+		crate.AddTrack(removeVolumeFromPath(t))
+	}
+	writeToFile(path, crate.GetCrateBytes())
 }
 
 func writeToFile(path string, data []byte) {
-	f, err := os.Create(path)
-	check(err)
-	defer f.Close()
-	f.Write(data)
-	f.Sync()
+	//f, err := os.Create(path)
+	//check(err)
+	//defer f.Close()
+	//f.Write(data)
+	//f.Sync()
+}
+
+func getCrates(map[string][]string) map[string][]Crate {
+ return nil
 }

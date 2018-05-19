@@ -104,3 +104,7 @@ func (c *Column) GetColumnBytes() []byte {
 func (c Column) String() string {
 	return fmt.Sprintf("ovct: %d  //  cleaned tvcn: %s  //  tvcw: %s", ReadInt32(c.ovct), string(UnPadByteArray(c.tvcn)), string(UnPadByteArray(c.tvcw)))
 }
+
+func GetDefaultColumn() []ColumnName {
+	return []ColumnName{song, artist, length, bpm, key, comment, grouping}
+}

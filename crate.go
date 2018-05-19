@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"fmt"
-	"path/filepath"
+	"strings"
 )
 
 const version = "81.0/Serato ScratchLive Crate"
@@ -80,8 +80,11 @@ func readTracks(f *os.File) []Track {
 
 }
 
-func (c *Crate) AddTrack(f *os.File) {
-	path, _ := filepath.Abs(f.Name())
+func (c *Crate) AddTrack(path string) {
+	if strings.Contains(path, "Regresar") {
+		fmt.Printf("hello")
+	}
+	//path, _ := filepath.Abs(f.Name())
 	t := NewTrack(path)
 	if !c.ContainsTrack(t) {
 		c.tracks = append(c.tracks, t)

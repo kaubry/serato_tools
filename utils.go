@@ -6,7 +6,6 @@ import (
 	"encoding/binary"
 	"path/filepath"
 	"os"
-	"fmt"
 )
 
 func ReadBytes(r io.Reader, nbrOfBytes int) ([]byte, error) {
