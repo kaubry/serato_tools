@@ -68,8 +68,8 @@ type Column struct {
 
 func NewColumn(name ColumnName, width int) Column {
 	c := Column{
-		tvcn: PadByteArray([]byte(name.String())),
-		tvcw: PadByteArray([]byte(strconv.Itoa(width))),
+		tvcn: EncodeUTF16(name.String(), false),
+		tvcw:  EncodeUTF16(strconv.Itoa(width), false),
 	}
 	return c
 }
@@ -102,9 +102,19 @@ func (c *Column) GetColumnBytes() []byte {
 }
 
 func (c Column) String() string {
-	return fmt.Sprintf("ovct: %d  //  cleaned tvcn: %s  //  tvcw: %s", ReadInt32(c.ovct), string(UnPadByteArray(c.tvcn)), string(UnPadByteArray(c.tvcw)))
+	return fmt.Sprintf("ovct: %d  //  cleaned tvcn: %s  //  tvcw: %s", ReadInt32(c.ovct), c.getTvcn(), c.getTvcw())
 }
 
 func GetDefaultColumn() []ColumnName {
 	return []ColumnName{song, artist, length, bpm, key, comment, grouping}
+}
+
+func (c Column) getTvcn() string {
+	s, _ := DecodeUTF16(c.tvcn)
+	return s
+}
+
+func (c Column) getTvcw() string {
+	s, _ := DecodeUTF16(c.tvcw)
+	return s
 }

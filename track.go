@@ -19,7 +19,7 @@ func ReadTrack(f *os.File) Track {
 }
 
 func NewTrack(path string) Track {
-	ptrk := PadByteArray([]byte(path))
+	ptrk := EncodeUTF16(path, false)
 	otrk := Int32ToByteArray(4, uint32(len(ptrk) + 8))
 	//h := Int32ToByteArray(4, uint32(len(ptrk)))
 	//ptrk = append(h, ptrk...)
@@ -34,8 +34,9 @@ func (t *Track) Equals(t2 Track) bool {
 	return bytes.Equal(t.otrk, t2.otrk) && bytes.Equal(t.ptrk, t2.ptrk)
 }
 
-func (track *Track) CleanTrackName() []byte {
-	return UnPadByteArray(track.ptrk)
+func (track *Track) CleanTrackName() string {
+	name, _ := DecodeUTF16(track.ptrk)
+	return name
 }
 
 func (track *Track) GetTrackBytes() []byte {

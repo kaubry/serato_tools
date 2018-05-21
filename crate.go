@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"fmt"
-	"strings"
 )
 
 const version = "81.0/Serato ScratchLive Crate"
@@ -31,9 +30,9 @@ func NewCrate(f *os.File) *Crate {
 
 func NewEmptyCrate(columnNames []ColumnName) *Crate {
 	crate := Crate{
-		vrsn:    PadForLength(PadByteArray([]byte(version)), 60),
+		vrsn:    EncodeUTF16(version, false),
 		osrt:    Int32ToByteArray(4, 19),
-		tvcn:    GetBytesWithDynamicLength(PadByteArray([]byte("#")), 4),
+		tvcn:    GetBytesWithDynamicLength(EncodeUTF16("#", false), 4),
 		brev:    []byte{0, 0, 0, 1, 0},
 		columns: make([]Column, 0),
 		tracks:  make([]Track, 0),
@@ -81,9 +80,6 @@ func readTracks(f *os.File) []Track {
 }
 
 func (c *Crate) AddTrack(path string) {
-	if strings.Contains(path, "Regresar") {
-		fmt.Printf("hello")
-	}
 	//path, _ := filepath.Abs(f.Name())
 	t := NewTrack(path)
 	if !c.ContainsTrack(t) {
@@ -105,7 +101,7 @@ func (c *Crate) AddColumn(name ColumnName) {
 func (c *Crate) TrackList() []string {
 	var output []string
 	for _, track := range c.tracks {
-		output = append(output, string(track.CleanTrackName()))
+		output = append(output, track.CleanTrackName())
 	}
 	return output
 }
@@ -132,6 +128,7 @@ func (c *Crate) GetCrateBytes() []byte {
 	var output []byte
 	//Version
 	output = append(output, []byte("vrsn")...)
+	output = append(output, []byte{0, 0}...)
 	output = append(output, c.vrsn...)
 	//Sorting
 	output = append(output, []byte("osrt")...)
@@ -157,5 +154,15 @@ func (c *Crate) GetCrateBytes() []byte {
 }
 
 func (c Crate) String() string {
-	return fmt.Sprintf("Vrsn: %s\n Osrt: %d\n Tvcn: %s", string(UnPadByteArray(c.vrsn)), ReadInt32(c.osrt), string(UnPadByteArray(c.tvcn)))
+	return fmt.Sprintf("Vrsn: %s\n Osrt: %d\n Tvcn: %s", c.getVrsn(), ReadInt32(c.osrt), c.getTvcn())
+}
+
+func (c Crate) getVrsn() string {
+	s, _ := DecodeUTF16(c.vrsn)
+	return s
+}
+
+func (c Crate) getTvcn() string {
+	s, _ := DecodeUTF16(c.tvcn)
+	return s
 }

@@ -54,39 +54,6 @@ func ReadBytesWithOffset(f *os.File, offset int64, length int64) []byte {
 	return returnValue
 }
 
-func PadByteArray(input []byte) []byte {
-	var output []byte
-	for _, b := range input {
-		output = append(output, byte(0), b)
-	}
-	return output
-}
-
-func PadForLength(input []byte, length int) []byte {
-	for {
-		if len(input) < length {
-			input = append([]byte{0}, input...)
-		} else {
-			break
-		}
-	}
-	return input
-}
-
-func UnPadByteArray(input []byte) []byte {
-	var t []byte
-	for _, b := range input {
-		if b != byte(0) {
-			t = append(t, b)
-		}
-	}
-	return t
-}
-
-func StringToPaddedByteArray(s string) []byte {
-	return PadByteArray([]byte(s))
-}
-
 func ListFiles(dir string) map[string][]string {
 	output := make(map[string][]string)
 	filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
