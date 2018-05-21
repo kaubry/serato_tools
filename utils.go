@@ -61,7 +61,7 @@ func ListFiles(dir string) map[string][]string {
 			if output[path] == nil {
 				output[path] = []string{}
 			}
-		} else if filepath.Ext(path) == ".mp3" {
+		} else if isValidExtension(filepath.Ext(path)) {
 			key := filepath.Dir(path)
 			if output[key] == nil {
 				output[key] = []string{}
@@ -72,6 +72,17 @@ func ListFiles(dir string) map[string][]string {
 	})
 
 	return output
+}
+
+func isValidExtension(extension string) bool {
+	switch extension {
+	case
+		".mp3",
+		".m4a",
+		".wav":
+		return true
+	}
+	return false
 }
 
 // EncodeUTF16 get a utf8 string and translate it into a slice of bytes of ucs2
