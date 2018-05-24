@@ -4,20 +4,22 @@ import (
 	"os"
 	"strings"
 	"path/filepath"
+	log "github.com/watershine/serato_crates/logger"
 )
 
 const volumePath = "E:\\"
 const musicPath = "GDrive\\DJ\\"
 
 func main() {
+	log.Logger.Debug("test")
 	//version := EncodeUTF16(version, true)
 	//fmt.Printf("%v", version)
-	files := ListFiles("E:/GDrive/DJ")
+	//files := ListFiles("E:/GDrive/DJ")
 	//files := ListFiles("E:/Test")
 	//for k,v := range files {
 	//	fmt.Printf("dir: %s  //   val:%s\n", k, v)
 	//}
-	createCrates(files)
+	//createCrates(files)
 	//createCrate()
 	//readCrate("./cuban.crate")
 	//fmt.Printf("\n")
