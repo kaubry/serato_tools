@@ -4,14 +4,15 @@ import (
 	"os"
 	"strings"
 	"path/filepath"
-	log "github.com/watershine/serato_crates/logger"
+	"github.com/watershine/serato_crates/cmd"
 )
 
 const volumePath = "E:\\"
 const musicPath = "GDrive\\DJ\\"
 
 func main() {
-	log.Logger.Debug("test")
+	cmd.Execute()
+	//log.Logger.Debug("test")
 	//version := EncodeUTF16(version, true)
 	//fmt.Printf("%v", version)
 	//files := ListFiles("E:/GDrive/DJ")
@@ -108,15 +109,6 @@ func createCrate(path string, columns []ColumnName, tracks ...string) {
 		//}
 		crate.AddTrack(removeVolumeFromPath(t))
 	}
-	//fmt.Printf("%s\n", crate)
-	//for _, c := range crate.columns {
-	//	fmt.Printf("%s\n", c)
-	//}
-	//fmt.Printf("---- Tracks ----\n")
-	//for _, t := range crate.tracks {
-	//	fmt.Printf("%s\n", t)
-	//
-	//}
 	writeToFile(path, crate.GetCrateBytes())
 }
 
