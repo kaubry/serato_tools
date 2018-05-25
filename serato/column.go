@@ -1,10 +1,12 @@
-package main
+package serato
 
 import (
 	"os"
 	"fmt"
 	"bytes"
 	"strconv"
+	"github.com/watershine/serato_crates/encoding"
+	"github.com/watershine/serato_crates/files"
 )
 
 type ColumnName int
@@ -68,17 +70,17 @@ type Column struct {
 
 func NewColumn(name ColumnName, width int) Column {
 	c := Column{
-		tvcn: EncodeUTF16(name.String(), false),
-		tvcw:  EncodeUTF16(strconv.Itoa(width), false),
+		tvcn: encoding.EncodeUTF16(name.String(), false),
+		tvcw:  encoding.EncodeUTF16(strconv.Itoa(width), false),
 	}
 	return c
 }
 
 func readColumn(f *os.File) Column {
 	return Column{
-		ovct: ReadBytesWithOffset(f, 4, 4),
-		tvcn: ReadBytesWithDynamicLength(f, 4, 4),
-		tvcw: ReadBytesWithDynamicLength(f, 4, 4),
+		ovct: files.ReadBytesWithOffset(f, 4, 4),
+		tvcn: files.ReadBytesWithDynamicLength(f, 4, 4),
+		tvcw: files.ReadBytesWithDynamicLength(f, 4, 4),
 	}
 }
 
@@ -90,19 +92,19 @@ func (c *Column) GetColumnBytes() []byte {
 	var output []byte
 	output = append(output, []byte("ovct")...)
 	length := len(c.tvcn) + len(c.tvcw) + 16
-	output = append(output, Int32ToByteArray(4, uint32(length))...)
+	output = append(output, encoding.Int32ToByteArray(4, uint32(length))...)
 
 	output = append(output, []byte("tvcn")...)
-	output = append(output, GetBytesWithDynamicLength(c.tvcn, 4)...)
+	output = append(output, files.GetBytesWithDynamicLength(c.tvcn, 4)...)
 
 	output = append(output, []byte("tvcw")...)
-	output = append(output, GetBytesWithDynamicLength(c.tvcw, 4)...)
+	output = append(output, files.GetBytesWithDynamicLength(c.tvcw, 4)...)
 
 	return output
 }
 
 func (c Column) String() string {
-	return fmt.Sprintf("ovct: %d  //  cleaned tvcn: %s  //  tvcw: %s", ReadInt32(c.ovct), c.getTvcn(), c.getTvcw())
+	return fmt.Sprintf("ovct: %d  //  cleaned tvcn: %s  //  tvcw: %s", files.ReadInt32(c.ovct), c.getTvcn(), c.getTvcw())
 }
 
 func GetDefaultColumn() []ColumnName {
@@ -110,11 +112,11 @@ func GetDefaultColumn() []ColumnName {
 }
 
 func (c Column) getTvcn() string {
-	s, _ := DecodeUTF16(c.tvcn)
+	s, _ := encoding.DecodeUTF16(c.tvcn)
 	return s
 }
 
 func (c Column) getTvcw() string {
-	s, _ := DecodeUTF16(c.tvcw)
+	s, _ := encoding.DecodeUTF16(c.tvcw)
 	return s
 }

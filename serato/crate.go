@@ -1,8 +1,10 @@
-package main
+package serato
 
 import (
 	"os"
 	"fmt"
+	"github.com/watershine/serato_crates/encoding"
+	"github.com/watershine/serato_crates/files"
 )
 
 const version = "81.0/Serato ScratchLive Crate"
@@ -18,10 +20,10 @@ type Crate struct {
 
 func NewCrate(f *os.File) *Crate {
 	crate := Crate{
-		vrsn:    ReadBytesWithOffset(f, 4, 60),
-		osrt:    ReadBytesWithOffset(f, 4, 4),
-		tvcn:    ReadBytesWithDynamicLength(f, 4, 4),
-		brev:    ReadBytesWithOffset(f, 4, 5),
+		vrsn:    files.ReadBytesWithOffset(f, 4, 60),
+		osrt:    files.ReadBytesWithOffset(f, 4, 4),
+		tvcn:    files.ReadBytesWithDynamicLength(f, 4, 4),
+		brev:    files.ReadBytesWithOffset(f, 4, 5),
 		columns: readColumns(f),
 		tracks:  readTracks(f),
 	}
@@ -30,9 +32,9 @@ func NewCrate(f *os.File) *Crate {
 
 func NewEmptyCrate(columnNames []ColumnName) *Crate {
 	crate := Crate{
-		vrsn:    EncodeUTF16(version, false),
-		osrt:    Int32ToByteArray(4, 19),
-		tvcn:    GetBytesWithDynamicLength(EncodeUTF16("#", false), 4),
+		vrsn:    encoding.EncodeUTF16(version, false),
+		osrt:    encoding.Int32ToByteArray(4, 19),
+		tvcn:    files.GetBytesWithDynamicLength(encoding.EncodeUTF16("#", false), 4),
 		brev:    []byte{0, 0, 0, 1, 0},
 		columns: make([]Column, 0),
 		tracks:  make([]Track, 0),
@@ -47,12 +49,12 @@ func NewEmptyCrate(columnNames []ColumnName) *Crate {
 func readColumns(f *os.File) []Column {
 	var columns []Column
 	for {
-		_, err := ReadBytes(f, 1)
+		_, err := files.ReadBytes(f, 1)
 		if err != nil {
 			break
 		} else {
 			f.Seek(-1, 1)
-			if string(ReadBytesWithOffset(f, 0, 4)) == "ovct" {
+			if string(files.ReadBytesWithOffset(f, 0, 4)) == "ovct" {
 				f.Seek(-4, 1)
 				columns = append(columns, readColumn(f))
 			} else {
@@ -67,7 +69,7 @@ func readColumns(f *os.File) []Column {
 func readTracks(f *os.File) []Track {
 	var tracks []Track
 	for {
-		_, err := ReadBytes(f, 1)
+		_, err := files.ReadBytes(f, 1)
 		if err != nil {
 			break
 		} else {
@@ -154,15 +156,15 @@ func (c *Crate) GetCrateBytes() []byte {
 }
 
 func (c Crate) String() string {
-	return fmt.Sprintf("Vrsn: %s\n Osrt: %d\n Tvcn: %s", c.getVrsn(), ReadInt32(c.osrt), c.getTvcn())
+	return fmt.Sprintf("Vrsn: %s\n Osrt: %d\n Tvcn: %s", c.getVrsn(), files.ReadInt32(c.osrt), c.getTvcn())
 }
 
 func (c Crate) getVrsn() string {
-	s, _ := DecodeUTF16(c.vrsn)
+	s, _ := encoding.DecodeUTF16(c.vrsn)
 	return s
 }
 
 func (c Crate) getTvcn() string {
-	s, _ := DecodeUTF16(c.tvcn)
+	s, _ := encoding.DecodeUTF16(c.tvcn)
 	return s
 }

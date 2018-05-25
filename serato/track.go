@@ -1,9 +1,11 @@
-package main
+package serato
 
 import (
 	"os"
 	"bytes"
 	"fmt"
+	"github.com/watershine/serato_crates/files"
+	"github.com/watershine/serato_crates/encoding"
 )
 
 type Track struct {
@@ -13,14 +15,14 @@ type Track struct {
 
 func ReadTrack(f *os.File) Track {
 	return Track{
-		otrk: ReadBytesWithOffset(f, 4, 4),
-		ptrk: ReadBytesWithDynamicLength(f, 4, 4),
+		otrk: files.ReadBytesWithOffset(f, 4, 4),
+		ptrk: files.ReadBytesWithDynamicLength(f, 4, 4),
 	}
 }
 
 func NewTrack(path string) Track {
-	ptrk := EncodeUTF16(path, false)
-	otrk := Int32ToByteArray(4, uint32(len(ptrk) + 8))
+	ptrk := encoding.EncodeUTF16(path, false)
+	otrk := encoding.Int32ToByteArray(4, uint32(len(ptrk) + 8))
 	//h := Int32ToByteArray(4, uint32(len(ptrk)))
 	//ptrk = append(h, ptrk...)
 	t := Track {
@@ -35,7 +37,7 @@ func (t *Track) Equals(t2 Track) bool {
 }
 
 func (track *Track) CleanTrackName() string {
-	name, _ := DecodeUTF16(track.ptrk)
+	name, _ := encoding.DecodeUTF16(track.ptrk)
 	return name
 }
 
@@ -46,11 +48,11 @@ func (track *Track) GetTrackBytes() []byte {
 	output = append(output, track.otrk...)
 
 	output = append(output, []byte("ptrk")...)
-	output = append(output, GetBytesWithDynamicLength(track.ptrk, 4)...)
+	output = append(output, files.GetBytesWithDynamicLength(track.ptrk, 4)...)
 
 	return output
 }
 
 func (track Track) String() string {
-	return fmt.Sprintf("otrk: %d  //  cleaned ptrk: %s", ReadInt32(track.otrk), string(track.CleanTrackName()))
+	return fmt.Sprintf("otrk: %d  //  cleaned ptrk: %s", files.ReadInt32(track.otrk), string(track.CleanTrackName()))
 }
