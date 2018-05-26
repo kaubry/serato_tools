@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"github.com/watershine/serato_crates/encoding"
 	"path/filepath"
+	"github.com/watershine/serato_crates/serato"
 )
 
 func WriteToFile(path string, data []byte) {
@@ -61,7 +62,7 @@ func ListFiles(dir string) map[string][]string {
 			if output[path] == nil {
 				output[path] = []string{}
 			}
-		} else if isValidExtension(filepath.Ext(path)) {
+		} else if serato.GetSupportedExtension().Has(filepath.Ext(path)) {
 			key := filepath.Dir(path)
 			if output[key] == nil {
 				output[key] = []string{}
@@ -72,17 +73,6 @@ func ListFiles(dir string) map[string][]string {
 	})
 
 	return output
-}
-
-func isValidExtension(extension string) bool {
-	switch extension {
-	case
-		".mp3",
-		".m4a",
-		".wav":
-		return true
-	}
-	return false
 }
 
 func check(e error) {
