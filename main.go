@@ -6,25 +6,6 @@ import (
 
 func main() {
 	cmd.Execute()
-	//log.Logger.Debug("test")
-	//version := EncodeUTF16(version, true)
-	//fmt.Printf("%v", version)
-	//files := ListFiles("E:/GDrive/DJ")
-	//files := ListFiles("E:/Test")
-	//for k,v := range files {
-	//	fmt.Printf("dir: %s  //   val:%s\n", k, v)
-	//}
-	//createCrates(files)
-	//createCrate()
-	//readCrate("./cuban.crate")
-	//fmt.Printf("\n")
-	//readCrate("./Kevin.crate")
-	//listFiles()
-	//f, _ := os.Open("./o.mp3")
-	//addTrack(f)
-	//readCrate("./ALFA18 Fri.crate")
-	//readCrate("./Test.crate")
-	//readCrate("./SubCrate4.crate")
 }
 
 
@@ -54,9 +35,6 @@ func main() {
 //func createCrateWithTracks(path string, columns []ColumnName, files []string) {
 //	crate
 //}
-
-
-
 
 
 //func getCrates(map[string][]string) map[string][]Crate {

@@ -17,23 +17,19 @@ var syncCommand = &cobra.Command{
 }
 
 func init() {
-	syncCommand.Flags().StringVarP(&volume, "volume", "v", "", "Volume where your music directory is (required)")
-	syncCommand.MarkFlagRequired("volume")
 
 	syncCommand.Flags().StringVarP(&musicDir, "dir", "d", "", "Root directory for your music (required)")
 	syncCommand.MarkFlagRequired("dir")
 
-	syncCommand.Flags().StringVarP(&rootCrate, "crate", "c", "", "Parent crate name (optional).")
+	syncCommand.Flags().StringVarP(&rootCrate, "crate", "c", "", "Parent crate name")
+	syncCommand.MarkFlagRequired("crate")
 
 	rootCmd.AddCommand(syncCommand)
 }
 
 func sync(cmd *cobra.Command, args []string) {
-	//@Todo fix issue with volume and music path
-	//path := filepath.Join(volume, musicDir)
-	f := files.ListFiles(musicDir)
+	f := files.ListFiles(musicDir, serato.GetSupportedExtension())
 	config := &serato.Config{
-		VolumePath: volume,
 		MusicPath: musicDir,
 		RootCrate: rootCrate,
 	}

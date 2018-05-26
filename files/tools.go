@@ -7,12 +7,12 @@ import (
 	"encoding/binary"
 	"github.com/watershine/serato_crates/encoding"
 	"path/filepath"
-	"github.com/watershine/serato_crates/serato"
+	"gopkg.in/fatih/set.v0"
 )
 
 func WriteToFile(path string, data []byte) {
-	f, _ := os.Create(path)
-	//check(err)
+	f, err := os.Create(path)
+	check(err)
 	defer f.Close()
 	f.Write(data)
 	f.Sync()
@@ -55,14 +55,14 @@ func ReadBytesWithOffset(f *os.File, offset int64, length int64) []byte {
 	return returnValue
 }
 
-func ListFiles(dir string) map[string][]string {
+func ListFiles(dir string, supporterExtension *set.Set) map[string][]string {
 	output := make(map[string][]string)
 	filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
 		if f.IsDir() {
 			if output[path] == nil {
 				output[path] = []string{}
 			}
-		} else if serato.GetSupportedExtension().Has(filepath.Ext(path)) {
+		} else if supporterExtension.Has(filepath.Ext(path)) {
 			key := filepath.Dir(path)
 			if output[key] == nil {
 				output[key] = []string{}
