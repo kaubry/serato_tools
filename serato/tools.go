@@ -76,12 +76,12 @@ func removeVolumeFromPath(path string) (string, error) {
 		volume := filepath.VolumeName(path)
 		return strings.Replace(path, volume+string(os.PathSeparator), "", 1), nil
 	} else if runtime.GOOS == "darwin" {
-		r, _ := regexp.Compile(`(\/Volume\/(.+)\/).+`)
+		r, _ := regexp.Compile(`(\/Volumes\/[\d\w\s]+\/).+`)
 		if !r.MatchString(path) {
 			return strings.Replace(path, string(os.PathSeparator), "", 1), nil
 		} else {
-			volume := r.FindStringSubmatch(path)[1]
-			return strings.Replace(path, volume+string(os.PathSeparator), "", 1), nil
+			matches := r.FindStringSubmatch(path)
+			return strings.Replace(path, matches[1], "", 1), nil
 		}
 	}
 	return "", errors.New("OS not supported")
@@ -97,11 +97,12 @@ func GetSeratoDir(c *Config) (string, error) {
 		}
 	} else if runtime.GOOS == "darwin" {
 
-		r, _ := regexp.Compile(`(\/Volume\/(.+)\/).+`)
+		r, _ := regexp.Compile(`(\/Volumes\/[\d\w\s]+\/).+`)
 		if !r.MatchString(c.MusicPath) {
 			return filepath.Join(getHomeDir(), "_Serato_"), nil
 		} else {
-			volume := r.FindStringSubmatch(c.MusicPath)[1]
+			matches := r.FindStringSubmatch(c.MusicPath)
+			volume := matches[1]
 			return filepath.Join(volume, "_Serato_"), nil
 		}
 	}
