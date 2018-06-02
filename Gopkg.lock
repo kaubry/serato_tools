@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/dhowden/tag"
+  packages = ["."]
+  revision = "e80a3fa76a9645b4a90127deab5b271d8c5bcf85"
+
+[[projects]]
   name = "github.com/inconshreveable/mousetrap"
   packages = ["."]
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
@@ -53,6 +59,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7410d230399aa7a580dc5ec59e3d623369a40a45fa4dbf1249d44ee998b1adb5"
+  inputs-digest = "400e2a2b88114e479d476f030987b309c914c7de37704c489e58055bb5f9f30b"
   solver-name = "gps-cdcl"
   solver-version = 1

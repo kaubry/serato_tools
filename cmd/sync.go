@@ -18,9 +18,6 @@ var syncCommand = &cobra.Command{
 
 func init() {
 
-	syncCommand.Flags().StringVarP(&musicDir, "dir", "d", "", "Root directory for your music (required)")
-	syncCommand.MarkFlagRequired("dir")
-
 	syncCommand.Flags().StringVarP(&rootCrate, "crate", "c", "", "Parent crate name")
 	syncCommand.MarkFlagRequired("crate")
 
