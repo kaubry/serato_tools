@@ -37,7 +37,7 @@ func initDuplicateSet(f map[string][]string) *set.Set {
 			file, _ := os.Open(f)
 			tags, err := tag.ReadFrom(file)
 			if err != nil {
-				log.Printf("Error reading tag for %s\n", f)
+				log.Printf("Error reading tag for %s\nReason %v\n", f, err)
 				continue
 			}
 			mf := &MusicFile{
