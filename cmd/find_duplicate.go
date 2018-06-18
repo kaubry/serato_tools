@@ -17,6 +17,9 @@ var fdCommand = &cobra.Command{
 }
 
 func init() {
+	fdCommand.Flags().StringVarP(&musicDir, "dir", "d", "", "Root directory for your music (required)")
+	fdCommand.MarkFlagRequired("dir")
+
 	rootCmd.AddCommand(fdCommand)
 }
 
