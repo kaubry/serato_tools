@@ -7,7 +7,7 @@ import (
 	"github.com/watershine/serato_crates/files"
 )
 
-const version = "81.0/Serato ScratchLive Crate"
+const version = "1.0/Serato ScratchLive Crate"
 
 type Crate struct {
 	vrsn    []byte //Version
@@ -20,7 +20,7 @@ type Crate struct {
 
 func NewCrate(f *os.File) *Crate {
 	crate := Crate{
-		vrsn:    files.ReadBytesWithOffset(f, 4, 60),
+		vrsn:    files.ReadBytesWithDynamicLength(f, 4, 4),
 		osrt:    files.ReadBytesWithOffset(f, 4, 4),
 		tvcn:    files.ReadBytesWithDynamicLength(f, 4, 4),
 		brev:    files.ReadBytesWithOffset(f, 4, 5),
@@ -34,7 +34,7 @@ func NewEmptyCrate(columnNames []ColumnName) *Crate {
 	crate := Crate{
 		vrsn:    encoding.EncodeUTF16(version, false),
 		osrt:    encoding.Int32ToByteArray(4, 19),
-		tvcn:    files.GetBytesWithDynamicLength(encoding.EncodeUTF16("#", false), 4),
+		tvcn:    encoding.EncodeUTF16("#", false),
 		brev:    []byte{0, 0, 0, 1, 0},
 		columns: make([]Column, 0),
 		tracks:  make([]Track, 0),
@@ -91,6 +91,15 @@ func (c *Crate) AddTrack(path string) {
 	}
 }
 
+func (c *Crate) RemoveTrack(path string) {
+	t := NewTrack(path)
+	if i := c.IndexOfTrack(t); i >= 0 {
+		c.tracks = append(c.tracks[:i], c.tracks[i+1:]...)
+	} else {
+		fmt.Printf("Track not in crate !!!")
+	}
+}
+
 func (c *Crate) AddColumn(name ColumnName) {
 	column := NewColumn(name, 0)
 	if !c.ContainsColumn(column) {
@@ -98,6 +107,10 @@ func (c *Crate) AddColumn(name ColumnName) {
 	} else {
 		fmt.Printf("Column already in crate !!!")
 	}
+}
+
+func (c *Crate) NumberOfTracks() int {
+	return len(c.tracks)
 }
 
 func (c *Crate) TrackList() []string {
@@ -109,12 +122,16 @@ func (c *Crate) TrackList() []string {
 }
 
 func (c *Crate) ContainsTrack(t Track) bool {
-	for _, track := range c.tracks {
+	return c.IndexOfTrack(t) >= 0
+}
+
+func (c *Crate) IndexOfTrack(t Track) int {
+	for index, track := range c.tracks {
 		if track.Equals(t) {
-			return true
+			return index
 		}
 	}
-	return false
+	return -1
 }
 
 func (c *Crate) ContainsColumn(col Column) bool {
@@ -130,14 +147,13 @@ func (c *Crate) GetCrateBytes() []byte {
 	var output []byte
 	//Version
 	output = append(output, []byte("vrsn")...)
-	output = append(output, []byte{0, 0}...)
-	output = append(output, c.vrsn...)
+	output = append(output, files.GetBytesWithDynamicLength(c.vrsn, 4)...)
 	//Sorting
 	output = append(output, []byte("osrt")...)
 	output = append(output, c.osrt...)
 	//Column Sort
 	output = append(output, []byte("tvcn")...)
-	output = append(output, c.tvcn...)
+	output = append(output, files.GetBytesWithDynamicLength(c.tvcn, 4)...)
 	//Brev
 	output = append(output, []byte("brev")...)
 	output = append(output, c.brev...)
@@ -155,16 +171,16 @@ func (c *Crate) GetCrateBytes() []byte {
 	return output
 }
 
-func (c Crate) String() string {
+func (c *Crate) String() string {
 	return fmt.Sprintf("Vrsn: %s\n Osrt: %d\n Tvcn: %s", c.getVrsn(), files.ReadInt32(c.osrt), c.getTvcn())
 }
 
-func (c Crate) getVrsn() string {
+func (c *Crate) getVrsn() string {
 	s, _ := encoding.DecodeUTF16(c.vrsn)
 	return s
 }
 
-func (c Crate) getTvcn() string {
+func (c *Crate) getTvcn() string {
 	s, _ := encoding.DecodeUTF16(c.tvcn)
 	return s
 }
