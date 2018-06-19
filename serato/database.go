@@ -5,18 +5,17 @@ import (
 	"github.com/watershine/serato_crates/files"
 	"fmt"
 	"github.com/watershine/serato_crates/encoding"
-	"github.com/watershine/serato_crates/logger"
 )
 
 type Database struct {
-	vrsn              []byte //Version
-	DatabaseMusicFile []DatabaseMusicFile
+	vrsn []byte //Version
+	Dmfs []DatabaseMusicFile
 }
 
 func NewDatabase(f *os.File) *Database {
 	database := Database{
-		vrsn:              files.ReadBytesWithDynamicLength(f, 4, 4),
-		DatabaseMusicFile: readDatabaseMusicFiles(f),
+		vrsn: files.ReadBytesWithDynamicLength(f, 4, 4),
+		Dmfs: readDatabaseMusicFiles(f),
 	}
 	return &database
 }
@@ -30,12 +29,22 @@ func readDatabaseMusicFiles(f *os.File) []DatabaseMusicFile {
 			f.Seek(-1, 1)
 			mf := ReadMusicFile(f)
 			df = append(df, mf)
-			logger.Logger.Debug(mf.String())
 		}
 	}
-	//df = append(df, ReadMusicFile(f))
-
 	return df
+}
+
+func (d *Database) GetBytes() []byte {
+	var output []byte
+	output = append(output, []byte("vrsn")...)
+	output = append(output, files.GetBytesWithDynamicLength(d.vrsn, 4)...)
+
+	//MusicFiles
+	for _, dmf := range d.Dmfs {
+		output = append(output, dmf.GetBytes()...)
+	}
+
+	return output
 }
 
 func (d *Database) String() string {

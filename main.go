@@ -1,21 +1,21 @@
 package main
 
 import (
-	"os"
-	"github.com/watershine/serato_crates/serato"
-	"github.com/watershine/serato_crates/logger"
+	"github.com/watershine/serato_crates/cmd"
 )
 
 func main() {
-	//cmd.Execute()
+	cmd.Execute()
 
-	f, err := os.Open("./database V2")
-	check(err)
-	d := serato.NewDatabase(f)
-	logger.Logger.Debug(d.String())
-	for _, t := range d.DatabaseMusicFile {
-		logger.Logger.Debug(t.String())
-	}
+	//f, err := os.Open("./database V2")
+	//check(err)
+	//d := serato.NewDatabase(f)
+	//logger.Logger.Debug(d.String())
+	//for _, t := range d.Dmfs {
+	//	logger.Logger.Debug(t.String())
+	//}
+	//
+	//files.WriteToFile("./database V2_1", d.GetBytes())
 }
 
 //func readCrate(path string) {
