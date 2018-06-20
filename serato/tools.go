@@ -133,6 +133,15 @@ func GetSupportedExtension() *set.Set {
 		".m4a")
 }
 
+func GetFilePath(path string, seratoDir string) (string, error) {
+	if runtime.GOOS == "windows" {
+		volume := filepath.VolumeName(seratoDir)
+			return filepath.Join(volume, path), nil
+	}
+	//@TODO implements for OS X
+	return "", errors.New("OS not supported")
+}
+
 func check(e error) {
 	if e != nil {
 		panic(e)

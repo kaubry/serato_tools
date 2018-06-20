@@ -54,9 +54,9 @@ func cleanCrates(cmd *cobra.Command, args []string) {
 func cleanCrate(crate *serato.Crate) {
 	tracks := crate.TrackList()
 	for _, t := range tracks {
-		//@TODO check on Windows
-		if _, err := os.Stat(string(os.PathSeparator) + t); os.IsNotExist(err) {
-			logger.Logger.Info("Removing track from crate", zap.String("track", t))
+		filePath, _ := serato.GetFilePath(string(os.PathSeparator)+t, seratoDir)
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			logger.Logger.Info("Removing track from crate", zap.String("track", filePath))
 			if !dryRun {
 				crate.RemoveTrack(t)
 			}
@@ -65,7 +65,7 @@ func cleanCrate(crate *serato.Crate) {
 }
 
 func cleanDatabase() {
-	f, err := os.Open(seratoDir + "/database V2")
+	f, err := os.Open(seratoDir + string(os.PathSeparator) + "database V2")
 	if err != nil {
 		logger.Logger.Error(err.Error())
 	} else {
@@ -74,8 +74,9 @@ func cleanDatabase() {
 		dmfPaths := db.GetMusicFiles()
 		before := len(dmfPaths)
 		for _, p := range dmfPaths {
-			if _, err := os.Stat(string(os.PathSeparator) + p); os.IsNotExist(err) {
-				logger.Logger.Info("Removing music file from database", zap.String("music file", p))
+			filePath, _ := serato.GetFilePath(string(os.PathSeparator)+p, seratoDir)
+			if _, err := os.Stat(filePath); os.IsNotExist(err) {
+				logger.Logger.Info("Removing music file from database", zap.String("music file", filePath))
 				if !dryRun {
 					db.RemoveMusicFile(p)
 				}
