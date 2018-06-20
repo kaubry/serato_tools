@@ -84,3 +84,7 @@ func (dmf *DatabaseMusicFile) GetBytes() []byte {
 func isString(s string) bool {
 	return strings.HasPrefix(s, "t") || s == "pfil"
 }
+
+func (dmf *DatabaseMusicFile) getFilePath() (string, error) {
+	return encoding.DecodeUTF16(dmf.fields["pfil"])
+}

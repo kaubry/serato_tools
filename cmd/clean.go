@@ -12,6 +12,7 @@ import (
 )
 
 var seratoDir string
+var database, dryRun bool
 
 var cleanCommand = &cobra.Command{
 	Use:   "clean",
@@ -24,6 +25,9 @@ func init() {
 	cleanCommand.Flags().StringVarP(&seratoDir, "dir", "d", "", "Serato directory to be cleaned (required)")
 	cleanCommand.MarkFlagRequired("dir")
 
+	cleanCommand.Flags().BoolVar(&database, "database", true, "Clean the database file. (Default: true)")
+	cleanCommand.Flags().BoolVar(&dryRun, "dryrun", false, "Run dry, it doesn't modify the files. (Default: false)")
+
 	rootCmd.AddCommand(cleanCommand)
 }
 
@@ -32,25 +36,56 @@ func cleanCrates(cmd *cobra.Command, args []string) {
 	for _, c := range crates {
 		f, _ := os.Open(c)
 		crate := serato.NewCrate(f)
-		logger.Logger.Debug("Cleaning crate", zap.String("crate", c))
+		logger.Logger.Info("Reading crate", zap.String("crate", c))
 		before := crate.NumberOfTracks()
 		cleanCrate(crate)
 		if before != crate.NumberOfTracks() {
-			logger.Logger.Debug("Updating crate", zap.String("crate", c))
+			logger.Logger.Info("Updating crate", zap.String("crate", c))
 			files.WriteToFile(c, crate.GetCrateBytes())
+		} else {
+			logger.Logger.Info("Nothing to clean", zap.String("crate", c))
 		}
-
 	}
-
+	if database {
+		cleanDatabase()
+	}
 }
 
 func cleanCrate(crate *serato.Crate) {
 	tracks := crate.TrackList()
 	for _, t := range tracks {
 		//@TODO check on Windows
-		if _, err := os.Stat(string(os.PathSeparator)+t); os.IsNotExist(err) {
+		if _, err := os.Stat(string(os.PathSeparator) + t); os.IsNotExist(err) {
 			logger.Logger.Info("Removing track from crate", zap.String("track", t))
-			crate.RemoveTrack(t)
+			if !dryRun {
+				crate.RemoveTrack(t)
+			}
+		}
+	}
+}
+
+func cleanDatabase() {
+	f, err := os.Open(seratoDir + "/database V2")
+	if err != nil {
+		logger.Logger.Error(err.Error())
+	} else {
+		db := serato.NewDatabase(f)
+		logger.Logger.Info("Cleaning Serato Database")
+		dmfPaths := db.GetMusicFiles()
+		before := len(dmfPaths)
+		for _, p := range dmfPaths {
+			if _, err := os.Stat(string(os.PathSeparator) + p); os.IsNotExist(err) {
+				logger.Logger.Info("Removing music file from database", zap.String("music file", p))
+				if !dryRun {
+					db.RemoveMusicFile(p)
+				}
+			}
+		}
+		if before != len(db.GetMusicFiles()) {
+			logger.Logger.Info("Updating Database")
+			files.WriteToFile(f.Name(), db.GetBytes())
+		} else {
+			logger.Logger.Info("Nothing to clean")
 		}
 	}
 }
@@ -69,5 +104,3 @@ func getCrates(dir string) []string {
 	}
 	return crates
 }
-
-

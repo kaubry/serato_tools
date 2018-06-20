@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/watershine/serato_crates/encoding"
 	"github.com/watershine/serato_crates/files"
+	"github.com/watershine/serato_crates/logger"
 )
 
 const version = "1.0/Serato ScratchLive Crate"
@@ -87,7 +88,7 @@ func (c *Crate) AddTrack(path string) {
 	if !c.ContainsTrack(t) {
 		c.tracks = append(c.tracks, t)
 	} else {
-		fmt.Printf("Track already in crate !!!")
+		logger.Logger.Error("Track already in crate !!!")
 	}
 }
 
@@ -96,7 +97,7 @@ func (c *Crate) RemoveTrack(path string) {
 	if i := c.IndexOfTrack(t); i >= 0 {
 		c.tracks = append(c.tracks[:i], c.tracks[i+1:]...)
 	} else {
-		fmt.Printf("Track not in crate !!!")
+		logger.Logger.Error("Track not in crate !!!")
 	}
 }
 
@@ -105,7 +106,7 @@ func (c *Crate) AddColumn(name ColumnName) {
 	if !c.ContainsColumn(column) {
 		c.columns = append(c.columns, column)
 	} else {
-		fmt.Printf("Column already in crate !!!")
+		logger.Logger.Error("Column already in crate !!!")
 	}
 }
 
