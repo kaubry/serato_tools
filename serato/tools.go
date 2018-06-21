@@ -9,7 +9,7 @@ import (
 	"os/user"
 	"errors"
 	"regexp"
-	"github.com/watershine/serato_crates/files"
+	"github.com/watershine/serato_tools/files"
 )
 
 const DARWIN_VOLUME_REGEX = `(\/Volumes\/[\d\w\s]+\/).+`

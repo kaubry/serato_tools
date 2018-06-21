@@ -5,7 +5,7 @@ import (
 	"io"
 	"bytes"
 	"encoding/binary"
-	"github.com/watershine/serato_crates/encoding"
+	"github.com/watershine/serato_tools/encoding"
 	"path/filepath"
 	"gopkg.in/fatih/set.v0"
 )

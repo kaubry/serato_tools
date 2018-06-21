@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/watershine/serato_crates/cmd"
+	"github.com/watershine/serato_tools/cmd"
 )
 
 func main() {

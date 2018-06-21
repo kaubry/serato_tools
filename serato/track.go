@@ -4,8 +4,8 @@ import (
 	"os"
 	"bytes"
 	"fmt"
-	"github.com/watershine/serato_crates/files"
-	"github.com/watershine/serato_crates/encoding"
+	"github.com/watershine/serato_tools/files"
+	"github.com/watershine/serato_tools/encoding"
 )
 
 type Track struct {

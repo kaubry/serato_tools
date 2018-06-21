@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/watershine/serato_crates/files"
+	"github.com/watershine/serato_tools/files"
 	"log"
 	"github.com/dhowden/tag"
 	"os"

@@ -1,9 +1,9 @@
 package serato
 
 import (
-	"github.com/watershine/serato_crates/files"
+	"github.com/watershine/serato_tools/files"
 	"os"
-	"github.com/watershine/serato_crates/encoding"
+	"github.com/watershine/serato_tools/encoding"
 	"bytes"
 	"strings"
 	"strconv"
