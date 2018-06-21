@@ -10,13 +10,13 @@ var Logger *zap.Logger
 func init() {
 	rawJSON := []byte(`{
 	  "level": "debug",
-	  "encoding": "json",
-	  "outputPaths": ["stdout", "/tmp/logs"],
+	  "encoding": "console",
+	  "outputPaths": ["stdout"],
 	  "errorOutputPaths": ["stderr"],
 	  "encoderConfig": {
 	    "messageKey": "message",
 	    "levelKey": "level",
-	    "levelEncoder": "lowercase"
+	    "levelEncoder": "capitalColor"
 	  }
 	}`)
 	var cfg zap.Config

@@ -12,6 +12,8 @@ import (
 	"github.com/watershine/serato_crates/files"
 )
 
+const DARWIN_VOLUME_REGEX = `(\/Volumes\/[\d\w\s]+\/).+`
+
 type Config struct {
 	MusicPath string
 	RootCrate string
@@ -97,7 +99,7 @@ func GetSeratoDir(c *Config) (string, error) {
 		}
 	} else if runtime.GOOS == "darwin" {
 
-		r, _ := regexp.Compile(`(\/Volumes\/[\d\w\s]+\/).+`)
+		r, _ := regexp.Compile(DARWIN_VOLUME_REGEX)
 		if !r.MatchString(c.MusicPath) {
 			return filepath.Join(getHomeDir(), "_Serato_"), nil
 		} else {
@@ -131,6 +133,23 @@ func GetSupportedExtension() *set.Set {
 		".wav",
 		".mp4",
 		".m4a")
+}
+
+func GetFilePath(path string, seratoDir string) (string, error) {
+	if runtime.GOOS == "windows" {
+		volume := filepath.VolumeName(seratoDir)
+		return filepath.Join(volume, path), nil
+	} else if runtime.GOOS == "darwin" {
+		r, _ := regexp.Compile(DARWIN_VOLUME_REGEX)
+		if r.MatchString(seratoDir) {
+			matches := r.FindStringSubmatch(seratoDir)
+			volume := matches[1]
+			return filepath.Join(volume, path), nil
+		} else {
+			return path, nil
+		}
+	}
+	return "", errors.New("OS not supported")
 }
 
 func check(e error) {
