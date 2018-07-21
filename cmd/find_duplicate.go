@@ -84,6 +84,7 @@ type MusicFile struct {
 
 func getFromSet(s *set.Set, mf *MusicFile) *MusicFile {
 	var foundItem *MusicFile
+	//@TODO Maybe replace with Set.Has() function
 	s.Each(func(f interface{}) bool {
 		if mf.isEqual(f.(*MusicFile)) {
 			foundItem = f.(*MusicFile)
