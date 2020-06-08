@@ -27,6 +27,7 @@ func findDuplicate(cmd *cobra.Command, args []string) {
 	supportedExtension := set.New(".mp3",
 		".ogg",
 		".flac",
+		".m4a",
 		".mp4")
 	f := files.ListFiles(musicDir,supportedExtension)
 	s := initDuplicateSet(f)
