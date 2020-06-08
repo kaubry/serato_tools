@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/watershine/serato_tools/files"
-	"github.com/watershine/serato_tools/serato"
+	"watershine/serato_tools/files"
+	"watershine/serato_tools/serato"
 )
 
 var volume string

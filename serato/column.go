@@ -1,18 +1,18 @@
 package serato
 
 import (
-	"os"
-	"fmt"
 	"bytes"
+	"fmt"
+	"os"
 	"strconv"
-	"github.com/watershine/serato_tools/encoding"
-	"github.com/watershine/serato_tools/files"
+	"watershine/serato_tools/encoding"
+	"watershine/serato_tools/files"
 )
 
 type ColumnName int
 
 const (
-	song        ColumnName = iota
+	song ColumnName = iota
 	added
 	album
 	artist
@@ -71,7 +71,7 @@ type Column struct {
 func NewColumn(name ColumnName, width int) Column {
 	c := Column{
 		tvcn: encoding.EncodeUTF16(name.String(), false),
-		tvcw:  encoding.EncodeUTF16(strconv.Itoa(width), false),
+		tvcw: encoding.EncodeUTF16(strconv.Itoa(width), false),
 	}
 	return c
 }

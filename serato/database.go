@@ -1,11 +1,11 @@
 package serato
 
 import (
-	"os"
-	"github.com/watershine/serato_tools/files"
 	"fmt"
-	"github.com/watershine/serato_tools/encoding"
-	"github.com/watershine/serato_tools/logger"
+	"os"
+	"watershine/serato_tools/encoding"
+	"watershine/serato_tools/files"
+	"watershine/serato_tools/logger"
 )
 
 type Database struct {

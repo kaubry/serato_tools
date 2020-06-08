@@ -1,18 +1,18 @@
 package serato
 
 import (
-	"github.com/watershine/serato_tools/files"
-	"os"
-	"github.com/watershine/serato_tools/encoding"
 	"bytes"
-	"strings"
+	"os"
 	"strconv"
+	"strings"
+	"watershine/serato_tools/encoding"
+	"watershine/serato_tools/files"
 )
 
 type DatabaseMusicFile struct {
 	otrk   []byte //length
 	fields map[string][]byte
-	keys   []string 			//Keys to keep the order in the fields map
+	keys   []string //Keys to keep the order in the fields map
 }
 
 //ttyp / pfil / tsng / tart / talb / tgen / tlen / tsiz / tbit / tsmp / tbpm / tcom / tgrp / trmx / tlbl / tcmp / ttyr / tadd / tkey / uadd / utkn / ulbl / utme / ufsb / sbav / bhrt / bmis / bply / blop / bitu / bovc / bcrt / biro / bwlb / bwll / buns / bbgl / bkrk /

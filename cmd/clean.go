@@ -2,14 +2,14 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"github.com/watershine/serato_tools/logger"
-	"path/filepath"
 	"go.uber.org/zap"
-	"github.com/watershine/serato_tools/serato"
-	"os"
-	"github.com/watershine/serato_tools/files"
 	"gopkg.in/fatih/set.v0"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"watershine/serato_tools/files"
+	"watershine/serato_tools/logger"
+	"watershine/serato_tools/serato"
 )
 
 var seratoDir string

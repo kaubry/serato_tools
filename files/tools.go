@@ -1,13 +1,13 @@
 package files
 
 import (
-	"os"
-	"io"
 	"bytes"
 	"encoding/binary"
-	"github.com/watershine/serato_tools/encoding"
-	"path/filepath"
 	"gopkg.in/fatih/set.v0"
+	"io"
+	"os"
+	"path/filepath"
+	"watershine/serato_tools/encoding"
 )
 
 func WriteToFile(path string, data []byte) {

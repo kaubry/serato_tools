@@ -1,15 +1,16 @@
 package serato
 
 import (
-	"strings"
-	"os"
-	"path/filepath"
-	"gopkg.in/fatih/set.v0"
-	"runtime"
-	"os/user"
 	"errors"
+	"os"
+	"os/user"
+	"path/filepath"
 	"regexp"
-	"github.com/watershine/serato_tools/files"
+	"runtime"
+	"strings"
+	"watershine/serato_tools/files"
+
+	"gopkg.in/fatih/set.v0"
 )
 
 const DARWIN_VOLUME_REGEX = `(\/Volumes\/[\d\w\s]+\/).+`

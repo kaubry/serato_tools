@@ -1,6 +1,6 @@
 package main
 
-import "github.com/watershine/serato_tools/cmd"
+import "watershine/serato_tools/cmd"
 
 func main() {
 	cmd.Execute()

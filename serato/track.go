@@ -1,11 +1,11 @@
 package serato
 
 import (
-	"os"
 	"bytes"
 	"fmt"
-	"github.com/watershine/serato_tools/files"
-	"github.com/watershine/serato_tools/encoding"
+	"os"
+	"watershine/serato_tools/encoding"
+	"watershine/serato_tools/files"
 )
 
 type Track struct {
@@ -22,10 +22,10 @@ func ReadTrack(f *os.File) Track {
 
 func NewTrack(path string) Track {
 	ptrk := encoding.EncodeUTF16(path, false)
-	otrk := encoding.Int32ToByteArray(4, uint32(len(ptrk) + 8))
+	otrk := encoding.Int32ToByteArray(4, uint32(len(ptrk)+8))
 	//h := Int32ToByteArray(4, uint32(len(ptrk)))
 	//ptrk = append(h, ptrk...)
-	t := Track {
+	t := Track{
 		otrk: otrk,
 		ptrk: ptrk,
 	}

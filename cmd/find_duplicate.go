@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/watershine/serato_tools/files"
-	"log"
-	"github.com/dhowden/tag"
-	"os"
-	"gopkg.in/fatih/set.v0"
 	"fmt"
+	"github.com/dhowden/tag"
+	"github.com/spf13/cobra"
+	"gopkg.in/fatih/set.v0"
+	"log"
+	"os"
+	"watershine/serato_tools/files"
 )
 
 var fdCommand = &cobra.Command{

@@ -18,5 +18,3 @@ func TestGetFilePath(t *testing.T) {
 		}
 	}
 }
-
-
