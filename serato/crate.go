@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/watershine/serato_tools/encoding"
-	"github.com/watershine/serato_tools/files"
-	"github.com/watershine/serato_tools/logger"
+	"github.com/kaubry/serato_tools/encoding"
+	"github.com/kaubry/serato_tools/files"
+	"github.com/kaubry/serato_tools/logger"
 )
 
 const version = "1.0/Serato ScratchLive Crate"

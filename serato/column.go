@@ -6,8 +6,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/watershine/serato_tools/encoding"
-	"github.com/watershine/serato_tools/files"
+	"github.com/kaubry/serato_tools/encoding"
+	"github.com/kaubry/serato_tools/files"
 )
 
 type ColumnName int

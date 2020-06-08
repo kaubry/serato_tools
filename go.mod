@@ -1,4 +1,4 @@
-module github.com/watershine/serato_tools
+module github.com/kaubry/serato_tools
 
 go 1.14
 

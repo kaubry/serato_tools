@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/watershine/serato_tools/files"
-	"github.com/watershine/serato_tools/logger"
-	"github.com/watershine/serato_tools/serato"
+	"github.com/kaubry/serato_tools/files"
+	"github.com/kaubry/serato_tools/logger"
+	"github.com/kaubry/serato_tools/serato"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
