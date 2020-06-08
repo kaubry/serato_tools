@@ -9,6 +9,7 @@ import (
 	"github.com/watershine/serato_tools/serato"
 	"os"
 	"github.com/watershine/serato_tools/files"
+	"gopkg.in/fatih/set.v0"
 )
 
 var seratoDir string
@@ -34,9 +35,9 @@ func init() {
 func cleanCrates(cmd *cobra.Command, args []string) {
 	crates := getCrates(filepath.Join(seratoDir, "Subcrates"))
 	for _, c := range crates {
+		logger.Logger.Info("Reading crate", zap.String("crate", c))
 		f, _ := os.Open(c)
 		crate := serato.NewCrate(f)
-		logger.Logger.Info("Reading crate", zap.String("crate", c))
 		before := crate.NumberOfTracks()
 		cleanCrate(crate)
 		if before != crate.NumberOfTracks() {
@@ -73,10 +74,19 @@ func cleanDatabase() {
 		logger.Logger.Info("Cleaning Serato Database")
 		dmfPaths := db.GetMusicFiles()
 		before := len(dmfPaths)
+		uniqueFiles := set.New()
 		for _, p := range dmfPaths {
 			filePath, _ := serato.GetFilePath(string(os.PathSeparator)+p, seratoDir)
-			if _, err := os.Stat(filePath); os.IsNotExist(err) {
-				logger.Logger.Info("Removing music file from database", zap.String("music file", filePath))
+			if !uniqueFiles.Has(filePath) {
+				uniqueFiles.Add(filePath)
+				if _, err := os.Stat(filePath); os.IsNotExist(err) {
+					logger.Logger.Info("File doesn't exists in your system, removing.", zap.String("music file", filePath))
+					if !dryRun {
+						db.RemoveMusicFile(p)
+					}
+				}
+			} else {
+				logger.Logger.Info("File is already in database, removing.", zap.String("music file", filePath))
 				if !dryRun {
 					db.RemoveMusicFile(p)
 				}
@@ -105,3 +115,19 @@ func getCrates(dir string) []string {
 	}
 	return crates
 }
+
+//func getStringFromSet(s *set.Set, fileName string) *MusicFile {
+//	var foundItem *MusicFile
+//	s.Each(func(f interface{}) bool {
+//		if mf.isEqual(f.(*MusicFile)) {
+//			foundItem = f.(*MusicFile)
+//			return false
+//		}
+//		return true
+//	})
+//	return foundItem
+//}
+//
+//func (m *MusicFile) isEqual(m2 *MusicFile) bool {
+//	return m.Title == m2.Title && m.Artist == m2.Artist
+//}

@@ -27,6 +27,7 @@ func findDuplicate(cmd *cobra.Command, args []string) {
 	supportedExtension := set.New(".mp3",
 		".ogg",
 		".flac",
+		".m4a",
 		".mp4")
 	f := files.ListFiles(musicDir,supportedExtension)
 	s := initDuplicateSet(f)
@@ -84,6 +85,7 @@ type MusicFile struct {
 
 func getFromSet(s *set.Set, mf *MusicFile) *MusicFile {
 	var foundItem *MusicFile
+	//@TODO Maybe replace with Set.Has() function
 	s.Each(func(f interface{}) bool {
 		if mf.isEqual(f.(*MusicFile)) {
 			foundItem = f.(*MusicFile)
