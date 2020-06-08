@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"watershine/serato_tools/files"
-	"watershine/serato_tools/serato"
+	"github.com/watershine/serato_tools/files"
+	"github.com/watershine/serato_tools/serato"
 
 	"github.com/spf13/cobra"
 )

@@ -5,8 +5,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"watershine/serato_tools/encoding"
-	"watershine/serato_tools/files"
+
+	"github.com/watershine/serato_tools/encoding"
+	"github.com/watershine/serato_tools/files"
 )
 
 type DatabaseMusicFile struct {

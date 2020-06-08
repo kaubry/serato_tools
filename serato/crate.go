@@ -3,9 +3,10 @@ package serato
 import (
 	"fmt"
 	"os"
-	"watershine/serato_tools/encoding"
-	"watershine/serato_tools/files"
-	"watershine/serato_tools/logger"
+
+	"github.com/watershine/serato_tools/encoding"
+	"github.com/watershine/serato_tools/files"
+	"github.com/watershine/serato_tools/logger"
 )
 
 const version = "1.0/Serato ScratchLive Crate"

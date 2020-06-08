@@ -8,7 +8,8 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
-	"watershine/serato_tools/files"
+
+	"github.com/watershine/serato_tools/files"
 
 	"gopkg.in/fatih/set.v0"
 )

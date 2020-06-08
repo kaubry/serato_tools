@@ -4,9 +4,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"watershine/serato_tools/files"
-	"watershine/serato_tools/logger"
-	"watershine/serato_tools/serato"
+
+	"github.com/watershine/serato_tools/files"
+	"github.com/watershine/serato_tools/logger"
+	"github.com/watershine/serato_tools/serato"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"

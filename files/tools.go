@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"watershine/serato_tools/encoding"
+	"github.com/watershine/serato_tools/encoding"
 
 	"gopkg.in/fatih/set.v0"
 )

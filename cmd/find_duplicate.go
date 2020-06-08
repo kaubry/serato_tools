@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"watershine/serato_tools/files"
+
+	"github.com/watershine/serato_tools/files"
 
 	"github.com/dhowden/tag"
 	"github.com/spf13/cobra"
