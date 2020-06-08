@@ -125,8 +125,9 @@ func GetSubcrateFolder(c *Config) (string, error) {
 	return filepath.Join(s, "/Subcrates"), nil
 }
 
-func GetSupportedExtension() *set.Set {
-	return set.New(".mp3",
+func GetSupportedExtension() set.Interface {
+	s := set.New(set.ThreadSafe)
+	s.Add(".mp3",
 		".ogg",
 		".alac", //Only on MAC
 		".flac",
@@ -134,6 +135,7 @@ func GetSupportedExtension() *set.Set {
 		".wav",
 		".mp4",
 		".m4a")
+	return s
 }
 
 func GetFilePath(path string, seratoDir string) (string, error) {

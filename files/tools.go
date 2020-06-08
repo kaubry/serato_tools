@@ -3,11 +3,12 @@ package files
 import (
 	"bytes"
 	"encoding/binary"
-	"gopkg.in/fatih/set.v0"
 	"io"
 	"os"
 	"path/filepath"
 	"watershine/serato_tools/encoding"
+
+	"gopkg.in/fatih/set.v0"
 )
 
 func WriteToFile(path string, data []byte) {
@@ -55,7 +56,7 @@ func ReadBytesWithOffset(f *os.File, offset int64, length int64) []byte {
 	return returnValue
 }
 
-func ListFiles(dir string, supporterExtension *set.Set) map[string][]string {
+func ListFiles(dir string, supporterExtension set.Interface) map[string][]string {
 	output := make(map[string][]string)
 	filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
 		if f.IsDir() {

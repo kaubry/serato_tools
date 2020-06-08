@@ -1,15 +1,16 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"go.uber.org/zap"
-	"gopkg.in/fatih/set.v0"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"watershine/serato_tools/files"
 	"watershine/serato_tools/logger"
 	"watershine/serato_tools/serato"
+
+	"github.com/spf13/cobra"
+	"go.uber.org/zap"
+	"gopkg.in/fatih/set.v0"
 )
 
 var seratoDir string
@@ -74,7 +75,7 @@ func cleanDatabase() {
 		logger.Logger.Info("Cleaning Serato Database")
 		dmfPaths := db.GetMusicFiles()
 		before := len(dmfPaths)
-		uniqueFiles := set.New()
+		uniqueFiles := set.New(set.ThreadSafe)
 		for _, p := range dmfPaths {
 			filePath, _ := serato.GetFilePath(string(os.PathSeparator)+p, seratoDir)
 			if !uniqueFiles.Has(filePath) {

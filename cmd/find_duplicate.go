@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/dhowden/tag"
-	"github.com/spf13/cobra"
-	"gopkg.in/fatih/set.v0"
 	"log"
 	"os"
 	"watershine/serato_tools/files"
+
+	"github.com/dhowden/tag"
+	"github.com/spf13/cobra"
+	"gopkg.in/fatih/set.v0"
 )
 
 var fdCommand = &cobra.Command{
@@ -24,18 +25,19 @@ func init() {
 }
 
 func findDuplicate(cmd *cobra.Command, args []string) {
-	supportedExtension := set.New(".mp3",
+	supportedExtension := set.New(set.ThreadSafe)
+	supportedExtension.Add(".mp3",
 		".ogg",
 		".flac",
 		".m4a",
 		".mp4")
-	f := files.ListFiles(musicDir,supportedExtension)
+	f := files.ListFiles(musicDir, supportedExtension)
 	s := initDuplicateSet(f)
 	printDuplicate(s)
 }
 
-func initDuplicateSet(f map[string][]string) *set.Set {
-	musicSet := set.New()
+func initDuplicateSet(f map[string][]string) set.Interface {
+	musicSet := set.New(set.ThreadSafe)
 	for _, files := range f {
 		for _, f := range files {
 			file, _ := os.Open(f)
@@ -45,8 +47,8 @@ func initDuplicateSet(f map[string][]string) *set.Set {
 				continue
 			}
 			mf := &MusicFile{
-				Artist:   tags.Artist(),
-				Title:    tags.Title(),
+				Artist: tags.Artist(),
+				Title:  tags.Title(),
 			}
 			fileFromSet := getFromSet(musicSet, mf)
 			if fileFromSet != nil {
@@ -60,7 +62,7 @@ func initDuplicateSet(f map[string][]string) *set.Set {
 	return musicSet
 }
 
-func printDuplicate(s *set.Set) {
+func printDuplicate(s set.Interface) {
 	total := 0
 	s.Each(func(f interface{}) bool {
 		mf := f.(*MusicFile)
@@ -83,7 +85,7 @@ type MusicFile struct {
 	FilePath []string
 }
 
-func getFromSet(s *set.Set, mf *MusicFile) *MusicFile {
+func getFromSet(s set.Interface, mf *MusicFile) *MusicFile {
 	var foundItem *MusicFile
 	//@TODO Maybe replace with Set.Has() function
 	s.Each(func(f interface{}) bool {

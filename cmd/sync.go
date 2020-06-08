@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"watershine/serato_tools/files"
 	"watershine/serato_tools/serato"
+
+	"github.com/spf13/cobra"
 )
 
 var volume string
@@ -11,9 +12,9 @@ var musicDir string
 var rootCrate string
 
 var syncCommand = &cobra.Command{
-	Use: "sync",
+	Use:   "sync",
 	Short: "Sync a folder (and all his subfolder with Serato)",
-	Run: sync,
+	Run:   sync,
 }
 
 func init() {
