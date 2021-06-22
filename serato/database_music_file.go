@@ -18,25 +18,43 @@ type DatabaseMusicFile struct {
 
 //ttyp / pfil / tsng / tart / talb / tgen / tlen / tsiz / tbit / tsmp / tbpm / tcom / tgrp / trmx / tlbl / tcmp / ttyr / tadd / tkey / uadd / utkn / ulbl / utme / ufsb / sbav / bhrt / bmis / bply / blop / bitu / bovc / bcrt / biro / bwlb / bwll / buns / bbgl / bkrk /
 
-func ReadMusicFile(f *os.File) DatabaseMusicFile {
+func ReadMusicFile(f *os.File) (DatabaseMusicFile, error) {
+	otrk, err := files.ReadBytesWithOffset(f, 4, 4)
+	if err != nil {
+		return DatabaseMusicFile{}, err
+	}
+
 	df := DatabaseMusicFile{
-		otrk:   files.ReadBytesWithOffset(f, 4, 4),
+		otrk:   otrk,
 		fields: make(map[string][]byte),
 	}
+
 	readLength := 0
 	for readLength < getIntField(df.otrk) {
-		readLength += readNextField(f, &df)
+		nextFieldLength, err := readNextField(f, &df)
+		if err != nil {
+			return DatabaseMusicFile{}, err
+		}
+
+		readLength += nextFieldLength
 	}
-	return df
+
+	return df, nil
 }
 
-func readNextField(f *os.File, dmf *DatabaseMusicFile) int {
+func readNextField(f *os.File, dmf *DatabaseMusicFile) (int, error) {
 	k, _ := files.ReadBytes(f, 4)
 	key := string(k)
-	dmf.fields[key] = files.ReadBytesWithDynamicLength(f, 0, 4)
+
+	nextField, err := files.ReadBytesWithDynamicLength(f, 0, 4)
+	if err != nil {
+		return 0, err
+	}
+
+	dmf.fields[key] = nextField
 	dmf.keys = append(dmf.keys, key)
 
-	return len(dmf.fields[string(key)]) + 4 + len(key)
+	return len(dmf.fields[string(key)]) + 4 + len(key), nil
 }
 
 func (d *DatabaseMusicFile) String() string {

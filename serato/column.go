@@ -77,12 +77,27 @@ func NewColumn(name ColumnName, width int) Column {
 	return c
 }
 
-func readColumn(f *os.File) Column {
-	return Column{
-		ovct: files.ReadBytesWithOffset(f, 4, 4),
-		tvcn: files.ReadBytesWithDynamicLength(f, 4, 4),
-		tvcw: files.ReadBytesWithDynamicLength(f, 4, 4),
+func readColumn(f *os.File) (Column, error) {
+	ovct, err := files.ReadBytesWithOffset(f, 4, 4)
+	if err != nil {
+		return Column{}, err
 	}
+
+	tvcn, err := files.ReadBytesWithDynamicLength(f, 4, 4)
+	if err != nil {
+		return Column{}, err
+	}
+
+	tvcw, err := files.ReadBytesWithDynamicLength(f, 4, 4)
+	if err != nil {
+		return Column{}, err
+	}
+
+	return Column{
+		ovct: ovct,
+		tvcn: tvcn,
+		tvcw: tvcw,
+	}, nil
 }
 
 func (c *Column) Equals(c2 Column) bool {

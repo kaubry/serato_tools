@@ -3,20 +3,33 @@ package files
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/gibsn/serato_tools/encoding"
 	"io"
 	"os"
 	"path/filepath"
-	"github.com/gibsn/serato_tools/encoding"
 
 	"gopkg.in/fatih/set.v0"
 )
 
-func WriteToFile(path string, data []byte) {
+func WriteToFile(path string, data []byte) error {
 	f, err := os.Create(path)
-	check(err)
+	if err != nil {
+		return err
+	}
+
 	defer f.Close()
-	f.Write(data)
-	f.Sync()
+
+	_, err = f.Write(data)
+	if err != nil {
+		return err
+	}
+
+	err = f.Sync()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func ReadBytes(r io.Reader, nbrOfBytes int) ([]byte, error) {
@@ -25,23 +38,35 @@ func ReadBytes(r io.Reader, nbrOfBytes int) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return b, nil
 }
 
 func ReadInt32(data []byte) (ret int32) {
 	buf := bytes.NewBuffer(data)
 	binary.Read(buf, binary.BigEndian, &ret)
+
 	return
 }
 
-func ReadBytesWithDynamicLength(f *os.File, offset int64, headerLength int64) []byte {
-	f.Seek(offset, 1)
+func ReadBytesWithDynamicLength(f *os.File, offset int64, headerLength int64) ([]byte, error) {
+	_, err := f.Seek(offset, 1)
+	if err != nil {
+		return nil, err
+	}
+
 	l, err := ReadBytes(f, int(headerLength))
-	check(err)
+	if err != nil {
+		return nil, err
+	}
+
 	length := ReadInt32(l)
-	returnValue, err2 := ReadBytes(f, int(length))
-	check(err2)
-	return returnValue
+	returnValue, err := ReadBytes(f, int(length))
+	if err != nil {
+		return nil, err
+	}
+
+	return returnValue, nil
 }
 
 func GetBytesWithDynamicLength(value []byte, headerLength int) []byte {
@@ -49,11 +74,18 @@ func GetBytesWithDynamicLength(value []byte, headerLength int) []byte {
 	return append(header, value...)
 }
 
-func ReadBytesWithOffset(f *os.File, offset int64, length int64) []byte {
-	f.Seek(offset, 1)
+func ReadBytesWithOffset(f *os.File, offset int64, length int64) ([]byte, error) {
+	_, err := f.Seek(offset, 1)
+	if err != nil {
+		return nil, err
+	}
+
 	returnValue, err := ReadBytes(f, int(length))
-	check(err)
-	return returnValue
+	if err != nil {
+		return nil, err
+	}
+
+	return returnValue, nil
 }
 
 func ListFiles(dir string, supporterExtension set.Interface) map[string][]string {
@@ -70,14 +102,9 @@ func ListFiles(dir string, supporterExtension set.Interface) map[string][]string
 			}
 			output[key] = append(output[key], path)
 		}
+
 		return nil
 	})
 
 	return output
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
 }

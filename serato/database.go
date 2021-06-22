@@ -2,6 +2,7 @@ package serato
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/gibsn/serato_tools/encoding"
@@ -14,26 +15,52 @@ type Database struct {
 	Dmfs []DatabaseMusicFile
 }
 
-func NewDatabase(f *os.File) *Database {
-	database := Database{
-		vrsn: files.ReadBytesWithDynamicLength(f, 4, 4),
-		Dmfs: readDatabaseMusicFiles(f),
+func NewDatabase(f *os.File) (*Database, error) {
+	vrsn, err := files.ReadBytesWithDynamicLength(f, 4, 4)
+	if err != nil {
+		return nil, err
 	}
-	return &database
+
+	dmfs, err := readDatabaseMusicFiles(f)
+	if err != nil {
+		return nil, err
+	}
+
+	database := Database{
+		vrsn: vrsn,
+		Dmfs: dmfs,
+	}
+
+	return &database, nil
 }
-func readDatabaseMusicFiles(f *os.File) []DatabaseMusicFile {
+
+func readDatabaseMusicFiles(f *os.File) ([]DatabaseMusicFile, error) {
 	var df []DatabaseMusicFile
+
 	for {
 		_, err := files.ReadBytes(f, 1)
 		if err != nil {
-			break
-		} else {
-			f.Seek(-1, 1)
-			mf := ReadMusicFile(f)
-			df = append(df, mf)
+			if err == io.EOF {
+				break
+			}
+
+			return nil, err
 		}
+
+		_, err = f.Seek(-1, 1)
+		if err != nil {
+			return nil, err
+		}
+
+		mf, err := ReadMusicFile(f)
+		if err != nil {
+			return nil, err
+		}
+
+		df = append(df, mf)
 	}
-	return df
+
+	return df, nil
 }
 
 func (d *Database) GetBytes() []byte {
