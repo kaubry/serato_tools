@@ -1,6 +1,6 @@
 package main
 
-import "github.com/kaubry/serato_tools/cmd"
+import "github.com/gibsn/serato_tools/cmd"
 
 func main() {
 	cmd.Execute()

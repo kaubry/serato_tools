@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kaubry/serato_tools/encoding"
-	"github.com/kaubry/serato_tools/files"
+	"github.com/gibsn/serato_tools/encoding"
+	"github.com/gibsn/serato_tools/files"
 )
 
 type Track struct {

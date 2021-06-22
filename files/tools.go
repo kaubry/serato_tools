@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"github.com/kaubry/serato_tools/encoding"
+	"github.com/gibsn/serato_tools/encoding"
 
 	"gopkg.in/fatih/set.v0"
 )

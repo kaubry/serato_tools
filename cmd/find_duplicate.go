@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/kaubry/serato_tools/files"
+	"github.com/gibsn/serato_tools/files"
 
 	"github.com/dhowden/tag"
 	"github.com/spf13/cobra"
