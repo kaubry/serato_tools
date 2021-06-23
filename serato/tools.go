@@ -14,7 +14,7 @@ import (
 	"gopkg.in/fatih/set.v0"
 )
 
-const DARWIN_VOLUME_REGEX = `(\/Volumes\/[\d\w\s]+\/).+`
+const DARWIN_VOLUME_REGEX = `(\/Volumes\/[\d\w\s]+).*`
 
 type Config struct {
 	MusicPath string
