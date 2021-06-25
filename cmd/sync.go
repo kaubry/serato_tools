@@ -7,10 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var volume string
-var musicDir string
-var rootCrate string
-
 var syncCommand = &cobra.Command{
 	Use:   "sync",
 	Short: "Sync a folder (and all his subfolder with Serato)",
