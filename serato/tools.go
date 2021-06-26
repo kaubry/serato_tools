@@ -51,7 +51,7 @@ func createCrate(path string, columns []ColumnName, c *Config, tracks ...string)
 		//if err != nil {
 		//	log.Printf("File %s is not a track", t)
 		//}
-		trackPath, err := removeVolumeFromPath(t)
+		trackPath, err := RemoveVolumeFromPath(t)
 		check(err)
 		crate.AddTrack(trackPath)
 	}
@@ -75,17 +75,17 @@ func removeMusicPathFromPath(file string, c *Config) string {
 	return strings.Replace(file, c.MusicPath, "", 1)
 }
 
-func removeVolumeFromPath(path string) (string, error) {
+func RemoveVolumeFromPath(path string) (string, error) {
 	if runtime.GOOS == "windows" {
 		volume := filepath.VolumeName(path)
 		return strings.Replace(path, volume+string(os.PathSeparator), "", 1), nil
 	} else if runtime.GOOS == "darwin" {
-		r, _ := regexp.Compile(`(\/Volumes\/[\d\w\s]+\/).+`)
+		r, _ := regexp.Compile(DARWIN_VOLUME_REGEX)
 		if !r.MatchString(path) {
 			return strings.Replace(path, string(os.PathSeparator), "", 1), nil
 		} else {
 			matches := r.FindStringSubmatch(path)
-			return strings.Replace(path, matches[1], "", 1), nil
+			return strings.Replace(path, matches[1]+string(os.PathSeparator), "", 1), nil
 		}
 	}
 	return "", errors.New("OS not supported")
