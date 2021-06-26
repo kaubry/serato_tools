@@ -107,3 +107,7 @@ func isString(s string) bool {
 func (dmf *DatabaseMusicFile) getFilePath() (string, error) {
 	return encoding.DecodeUTF16(dmf.fields["pfil"])
 }
+
+func (dmf *DatabaseMusicFile) SetFilePath(path string) {
+	dmf.fields["pfil"] = encoding.EncodeUTF16(path, true)
+}
