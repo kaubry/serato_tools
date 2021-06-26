@@ -106,6 +106,10 @@ func (d *Database) RemoveMusicFile(path string) {
 	}
 }
 
+func (d *Database) AddMusicFile(file DatabaseMusicFile) {
+	d.Dmfs = append(d.Dmfs, file)
+}
+
 func (d *Database) IndexOfMusicFile(path string) int {
 	for index, dmf := range d.Dmfs {
 		p, _ := dmf.getFilePath()
