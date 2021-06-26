@@ -16,6 +16,10 @@ import (
 
 const DARWIN_VOLUME_REGEX = `(\/Volumes\/[\d\w\s]+).*`
 
+var (
+	darwinVolumeRegex = regexp.MustCompile(DARWIN_VOLUME_REGEX)
+)
+
 type Config struct {
 	MusicPath string
 	RootCrate string
@@ -79,15 +83,17 @@ func RemoveVolumeFromPath(path string) (string, error) {
 	if runtime.GOOS == "windows" {
 		volume := filepath.VolumeName(path)
 		return strings.Replace(path, volume+string(os.PathSeparator), "", 1), nil
-	} else if runtime.GOOS == "darwin" {
-		r, _ := regexp.Compile(DARWIN_VOLUME_REGEX)
-		if !r.MatchString(path) {
-			return strings.Replace(path, string(os.PathSeparator), "", 1), nil
-		} else {
-			matches := r.FindStringSubmatch(path)
-			return strings.Replace(path, matches[1]+string(os.PathSeparator), "", 1), nil
-		}
 	}
+
+	if runtime.GOOS == "darwin" {
+		if !darwinVolumeRegex.MatchString(path) {
+			return strings.Replace(path, string(os.PathSeparator), "", 1), nil
+		}
+
+		matches := darwinVolumeRegex.FindStringSubmatch(path)
+		return strings.Replace(path, matches[1]+string(os.PathSeparator), "", 1), nil
+	}
+
 	return "", errors.New("OS not supported")
 }
 
@@ -96,20 +102,21 @@ func GetSeratoDir(c *Config) (string, error) {
 		volume := filepath.VolumeName(c.MusicPath)
 		if volume == "C:" {
 			return filepath.Join(getHomeDir(), "_Serato_"), nil
-		} else {
-			return filepath.Join(volume, "/_Serato_"), nil
 		}
-	} else if runtime.GOOS == "darwin" {
 
-		r, _ := regexp.Compile(DARWIN_VOLUME_REGEX)
-		if !r.MatchString(c.MusicPath) {
-			return filepath.Join(getHomeDir(), "_Serato_"), nil
-		} else {
-			matches := r.FindStringSubmatch(c.MusicPath)
-			volume := matches[1]
-			return filepath.Join(volume, "_Serato_"), nil
-		}
+		return filepath.Join(volume, "/_Serato_"), nil
 	}
+
+	if runtime.GOOS == "darwin" {
+		if !darwinVolumeRegex.MatchString(c.MusicPath) {
+			return filepath.Join(getHomeDir(), "_Serato_"), nil
+		}
+
+		matches := darwinVolumeRegex.FindStringSubmatch(c.MusicPath)
+		volume := matches[1]
+		return filepath.Join(volume, "_Serato_"), nil
+	}
+
 	return "", errors.New("OS not supported")
 }
 
@@ -143,16 +150,24 @@ func GetFilePath(path string, seratoDir string) (string, error) {
 	if runtime.GOOS == "windows" {
 		volume := filepath.VolumeName(seratoDir)
 		return filepath.Join(volume, path), nil
-	} else if runtime.GOOS == "darwin" {
-		r, _ := regexp.Compile(DARWIN_VOLUME_REGEX)
-		if r.MatchString(seratoDir) {
-			matches := r.FindStringSubmatch(seratoDir)
-			volume := matches[1]
-			return filepath.Join(volume, path), nil
-		} else {
-			return path, nil
-		}
 	}
+
+	if runtime.GOOS == "darwin" {
+		if darwinVolumeRegex.MatchString(seratoDir) {
+			matches := darwinVolumeRegex.FindStringSubmatch(seratoDir)
+			volume := matches[1]
+
+			return filepath.Join(volume, path), nil
+		}
+		// cornercase: when Serato directory is in the homedir
+		// there is no "/Volumes/" prefix in the path
+		if strings.HasPrefix(seratoDir, "/Users/") {
+			return "/" + path, nil
+		}
+
+		return path, nil
+	}
+
 	return "", errors.New("OS not supported")
 }
 
