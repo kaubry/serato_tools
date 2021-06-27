@@ -85,6 +85,10 @@ func readColumns(f *os.File) ([]Column, error) {
 	for {
 		_, err := files.ReadBytes(f, 1)
 		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
 			return nil, err
 		}
 
