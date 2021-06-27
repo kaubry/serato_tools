@@ -5,9 +5,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/gibsn/serato_tools/encoding"
-	"github.com/gibsn/serato_tools/files"
-	"github.com/gibsn/serato_tools/logger"
+	"github.com/kaubry/serato_tools/encoding"
+	"github.com/kaubry/serato_tools/files"
+	"github.com/kaubry/serato_tools/logger"
 )
 
 const version = "1.0/Serato ScratchLive Crate"

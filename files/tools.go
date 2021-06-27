@@ -3,7 +3,7 @@ package files
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/gibsn/serato_tools/encoding"
+	"github.com/kaubry/serato_tools/encoding"
 	"io"
 	"os"
 	"path/filepath"

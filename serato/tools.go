@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/gibsn/serato_tools/files"
+	"github.com/kaubry/serato_tools/files"
 
 	"gopkg.in/fatih/set.v0"
 )

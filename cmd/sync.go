@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/gibsn/serato_tools/files"
-	"github.com/gibsn/serato_tools/serato"
+	"github.com/kaubry/serato_tools/files"
+	"github.com/kaubry/serato_tools/serato"
 
 	"github.com/spf13/cobra"
 )
