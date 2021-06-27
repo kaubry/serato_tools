@@ -111,3 +111,25 @@ func (dmf *DatabaseMusicFile) getFilePath() (string, error) {
 func (dmf *DatabaseMusicFile) SetFilePath(path string) {
 	dmf.fields["pfil"] = encoding.EncodeUTF16(path, false)
 }
+
+func (dmf *DatabaseMusicFile) DeepCopy() DatabaseMusicFile {
+	var newDMF DatabaseMusicFile
+
+	newDMF.otrk = make([]byte, len(dmf.otrk))
+	copy(newDMF.otrk, dmf.otrk)
+
+	newDMF.fields = make(map[string][]byte, len(dmf.fields))
+
+	for k, v := range dmf.fields {
+		newDMF.fields[k] = make([]byte, len(v))
+		copy(newDMF.fields[k], v)
+	}
+
+	newDMF.keys = make([]string, 0, len(dmf.keys))
+
+	for _, key := range dmf.keys {
+		newDMF.keys = append(newDMF.keys, key)
+	}
+
+	return newDMF
+}
