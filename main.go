@@ -5,6 +5,8 @@ import "github.com/kaubry/serato_tools/cmd"
 func main() {
 	cmd.Execute()
 
+	//readCrate("./DJ Yuma%%80s%%Selection.crate")
+	//readCrate("./Test X OS.crate")
 	//f, err := os.Open("./database V2")
 	//check(err)
 	//d := serato.NewDatabase(f)
@@ -19,20 +21,19 @@ func main() {
 //func readCrate(path string) {
 //	f, err := os.Open(path)
 //	check(err)
-//	NewCrate(f)
-//track := crate.TrackList()[0]
-
-//fmt.Printf("%s\n", crate)
-//for _, c := range crate.columns {
-//	fmt.Printf("%s\n", c)
-//}
-//fmt.Printf("---- Tracks ----\n")
-//for _, t := range crate.tracks {
-//	fmt.Printf("%s\n", t)
+//	crate := serato.NewCrate(f)
+//	tracks := crate.TrackList()
 //
-//}
+//	fmt.Printf("%s\n", crate)
+//	//for _, c := range crate.columns {
+//	//	fmt.Printf("%s\n", c)
+//	//}
+//	fmt.Printf("---- Tracks ----\n")
+//	for _, t := range tracks {
+//		fmt.Printf("%s\n", t)
+//	}
 //fmt.Printf("%s", crate.tracks[0])
-
+//
 //t := NewTrack("Users/kevin/Downloads/Haila - De Donde Vengo.mp3")
 //fmt.Printf("%v", t.Equals(crate.tracks[0]))
 //display := crate.brev

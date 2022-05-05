@@ -7,11 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
 var musicDir string
 var rootCrate string
 
 var seratoDir string
+var directory string
 var database, dryRun bool
 
 var rootCmd = &cobra.Command{
