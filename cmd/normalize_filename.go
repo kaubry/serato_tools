@@ -51,6 +51,7 @@ func normalizeFilename(cmd *cobra.Command, args []string) {
 				newPath := filepath.Join(currentDirectory, string(normalized))
 
 				fmt.Printf("Old Path: %s: ", oldPath)
+				fmt.Printf("\n")
 				fmt.Printf("New Path: %s: ", newPath)
 
 				fmt.Printf("\n")
