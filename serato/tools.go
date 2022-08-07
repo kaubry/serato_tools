@@ -120,6 +120,9 @@ func removeMusicPathFromPath(file string, c *Config) string {
 func RemoveVolumeFromPath(path string) (string, error) {
 	if runtime.GOOS == "windows" {
 		volume := filepath.VolumeName(path)
+		if volume == "" {
+			return "", fmt.Errorf("%w '%s'", ErrInvalidPath, path)
+		}
 		return strings.Replace(path, volume+string(os.PathSeparator), "", 1), nil
 	}
 

@@ -49,12 +49,7 @@ type removeVolumeTestCase struct {
 }
 
 func TestRemoveVolumeFromPath(t *testing.T) {
-	for _, test := range []removeVolumeTestCase{
-		{"/Volumes/TestVolume1/example.mp3", "example.mp3"},
-		{"/Volumes/TestVolume1/Music/example.mp3", "Music/example.mp3"},
-		{"/Users/test/Desktop/example.mp3", "Users/test/Desktop/example.mp3"},
-		{"SomeRelativePath/example.mp3", ""},
-	} {
+	for _, test := range removeVolumeTestCaseExpect {
 		result, _ := RemoveVolumeFromPath(test.path)
 		if result != test.result {
 			t.Errorf("expected '%s', got '%s'", test.result, result)
