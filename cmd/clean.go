@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"gopkg.in/fatih/set.v0"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/kaubry/serato_tools/files"
 	"github.com/kaubry/serato_tools/logger"
@@ -11,11 +13,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
-	"gopkg.in/fatih/set.v0"
 )
-
-var seratoDir string
-var database, dryRun bool
 
 var cleanCommand = &cobra.Command{
 	Use:   "clean",
@@ -37,21 +35,22 @@ func init() {
 func cleanCrates(cmd *cobra.Command, args []string) {
 	crates := getCrates(filepath.Join(seratoDir, "Subcrates"))
 	for _, c := range crates {
-		logger.Logger.Info("Reading crate", zap.String("crate", c))
-		f, _ := os.Open(c)
-		crate, err := serato.NewCrate(f)
-		if err != nil {
+		if !strings.Contains(strings.ToLower(c), "video") {
+			logger.Logger.Info("Reading crate", zap.String("crate", c))
+			f, _ := os.Open(c)
+			crate, err := serato.NewCrate(f)
+      if err != nil {
 			logger.Logger.Error("Could not read create", zap.Error(err))
 			return
 		}
-
-		before := crate.NumberOfTracks()
-		cleanCrate(crate)
-		if before != crate.NumberOfTracks() {
-			logger.Logger.Info("Updating crate", zap.String("crate", c))
-			files.WriteToFile(c, crate.GetCrateBytes())
-		} else {
-			logger.Logger.Info("Nothing to clean", zap.String("crate", c))
+			before := crate.NumberOfTracks()
+			cleanCrate(crate)
+			if before != crate.NumberOfTracks() {
+				logger.Logger.Info("Updating crate", zap.String("crate", c))
+				files.WriteToFile(c, crate.GetCrateBytes())
+			} else {
+				logger.Logger.Info("Nothing to clean", zap.String("crate", c))
+			}
 		}
 	}
 	if database {
