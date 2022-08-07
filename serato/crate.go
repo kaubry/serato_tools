@@ -2,6 +2,7 @@ package serato
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/kaubry/serato_tools/encoding"
@@ -20,16 +21,47 @@ type Crate struct {
 	tracks  []Track
 }
 
-func NewCrate(f *os.File) *Crate {
-	crate := Crate{
-		vrsn:    files.ReadBytesWithDynamicLength(f, 4, 4),
-		osrt:    files.ReadBytesWithOffset(f, 4, 4),
-		tvcn:    files.ReadBytesWithDynamicLength(f, 4, 4),
-		brev:    files.ReadBytesWithOffset(f, 4, 5),
-		columns: readColumns(f),
-		tracks:  readTracks(f),
+func NewCrate(f *os.File) (*Crate, error) {
+	vrsn, err := files.ReadBytesWithDynamicLength(f, 4, 4)
+	if err != nil {
+		return nil, err
 	}
-	return &crate
+
+	osrt, err := files.ReadBytesWithOffset(f, 4, 4)
+	if err != nil {
+		return nil, err
+	}
+
+	tvcn, err := files.ReadBytesWithDynamicLength(f, 4, 4)
+	if err != nil {
+		return nil, err
+	}
+
+	brev, err := files.ReadBytesWithOffset(f, 4, 5)
+	if err != nil {
+		return nil, err
+	}
+
+	columns, err := readColumns(f)
+	if err != nil {
+		return nil, err
+	}
+
+	tracks, err := readTracks(f)
+	if err != nil {
+		return nil, err
+	}
+
+	crate := Crate{
+		vrsn:    vrsn,
+		osrt:    osrt,
+		tvcn:    tvcn,
+		brev:    brev,
+		columns: columns,
+		tracks:  tracks,
+	}
+
+	return &crate, nil
 }
 
 func NewEmptyCrate(columnNames []ColumnName) *Crate {
@@ -48,39 +80,79 @@ func NewEmptyCrate(columnNames []ColumnName) *Crate {
 	return &crate
 }
 
-func readColumns(f *os.File) []Column {
+func readColumns(f *os.File) ([]Column, error) {
 	var columns []Column
 	for {
 		_, err := files.ReadBytes(f, 1)
 		if err != nil {
-			break
-		} else {
-			f.Seek(-1, 1)
-			if string(files.ReadBytesWithOffset(f, 0, 4)) == "ovct" {
-				f.Seek(-4, 1)
-				columns = append(columns, readColumn(f))
-			} else {
-				f.Seek(-4, 1)
+			if err == io.EOF {
 				break
 			}
+
+			return nil, err
 		}
+
+		_, err = f.Seek(-1, 1)
+		if err != nil {
+			return nil, err
+		}
+
+		possibleOvct, err := files.ReadBytesWithOffset(f, 0, 4)
+		if err != nil {
+			return nil, err
+		}
+
+		if string(possibleOvct) != "ovct" {
+			_, err = f.Seek(-4, 1)
+			if err != nil {
+				return nil, err
+			}
+
+			break
+		}
+
+		_, err = f.Seek(-4, 1)
+		if err != nil {
+			return nil, err
+		}
+
+		column, err := readColumn(f)
+		if err != nil {
+			return nil, err
+		}
+
+		columns = append(columns, column)
 	}
-	return columns
+
+	return columns, nil
 }
 
-func readTracks(f *os.File) []Track {
+func readTracks(f *os.File) ([]Track, error) {
 	var tracks []Track
 	for {
 		_, err := files.ReadBytes(f, 1)
 		if err != nil {
-			break
-		} else {
-			f.Seek(-1, 1)
-			tracks = append(tracks, ReadTrack(f))
-		}
-	}
-	return tracks
+			if err == io.EOF {
+				break
+			}
 
+			return nil, err
+		}
+
+		_, err = f.Seek(-1, 1)
+		if err != nil {
+			return nil, err
+		}
+
+		track, err := ReadTrack(f)
+		if err != nil {
+			return nil, err
+		}
+
+		tracks = append(tracks, track)
+	}
+
+	return tracks, nil
 }
 
 func (c *Crate) AddTrack(path string) {

@@ -14,11 +14,21 @@ type Track struct {
 	ptrk []byte //Track name (location)
 }
 
-func ReadTrack(f *os.File) Track {
-	return Track{
-		otrk: files.ReadBytesWithOffset(f, 4, 4),
-		ptrk: files.ReadBytesWithDynamicLength(f, 4, 4),
+func ReadTrack(f *os.File) (Track, error) {
+	otrk, err := files.ReadBytesWithOffset(f, 4, 4)
+	if err != nil {
+		return Track{}, err
 	}
+
+	ptrk, err := files.ReadBytesWithDynamicLength(f, 4, 4)
+	if err != nil {
+		return Track{}, err
+	}
+
+	return Track{
+		otrk: otrk,
+		ptrk: ptrk,
+	}, nil
 }
 
 func NewTrack(path string) Track {

@@ -38,7 +38,11 @@ func cleanCrates(cmd *cobra.Command, args []string) {
 		if !strings.Contains(strings.ToLower(c), "video") {
 			logger.Logger.Info("Reading crate", zap.String("crate", c))
 			f, _ := os.Open(c)
-			crate := serato.NewCrate(f)
+			crate, err := serato.NewCrate(f)
+      if err != nil {
+			logger.Logger.Error("Could not read create", zap.Error(err))
+			return
+		}
 			before := crate.NumberOfTracks()
 			cleanCrate(crate)
 			if before != crate.NumberOfTracks() {
@@ -72,7 +76,12 @@ func cleanDatabase() {
 	if err != nil {
 		logger.Logger.Error(err.Error())
 	} else {
-		db := serato.NewDatabase(f)
+		db, err := serato.NewDatabase(f)
+		if err != nil {
+			logger.Logger.Error("Could not read database:", zap.Error(err))
+			return
+		}
+
 		logger.Logger.Info("Cleaning Serato Database")
 		dmfPaths := db.GetMusicFiles()
 		before := len(dmfPaths)

@@ -18,25 +18,43 @@ type DatabaseMusicFile struct {
 
 //ttyp / pfil / tsng / tart / talb / tgen / tlen / tsiz / tbit / tsmp / tbpm / tcom / tgrp / trmx / tlbl / tcmp / ttyr / tadd / tkey / uadd / utkn / ulbl / utme / ufsb / sbav / bhrt / bmis / bply / blop / bitu / bovc / bcrt / biro / bwlb / bwll / buns / bbgl / bkrk /
 
-func ReadMusicFile(f *os.File) DatabaseMusicFile {
+func ReadMusicFile(f *os.File) (DatabaseMusicFile, error) {
+	otrk, err := files.ReadBytesWithOffset(f, 4, 4)
+	if err != nil {
+		return DatabaseMusicFile{}, err
+	}
+
 	df := DatabaseMusicFile{
-		otrk:   files.ReadBytesWithOffset(f, 4, 4),
+		otrk:   otrk,
 		fields: make(map[string][]byte),
 	}
+
 	readLength := 0
 	for readLength < getIntField(df.otrk) {
-		readLength += readNextField(f, &df)
+		nextFieldLength, err := readNextField(f, &df)
+		if err != nil {
+			return DatabaseMusicFile{}, err
+		}
+
+		readLength += nextFieldLength
 	}
-	return df
+
+	return df, nil
 }
 
-func readNextField(f *os.File, dmf *DatabaseMusicFile) int {
+func readNextField(f *os.File, dmf *DatabaseMusicFile) (int, error) {
 	k, _ := files.ReadBytes(f, 4)
 	key := string(k)
-	dmf.fields[key] = files.ReadBytesWithDynamicLength(f, 0, 4)
+
+	nextField, err := files.ReadBytesWithDynamicLength(f, 0, 4)
+	if err != nil {
+		return 0, err
+	}
+
+	dmf.fields[key] = nextField
 	dmf.keys = append(dmf.keys, key)
 
-	return len(dmf.fields[string(key)]) + 4 + len(key)
+	return len(dmf.fields[string(key)]) + 4 + len(key), nil
 }
 
 func (d *DatabaseMusicFile) String() string {
@@ -88,4 +106,30 @@ func isString(s string) bool {
 
 func (dmf *DatabaseMusicFile) getFilePath() (string, error) {
 	return encoding.DecodeUTF16(dmf.fields["pfil"])
+}
+
+func (dmf *DatabaseMusicFile) SetFilePath(path string) {
+	dmf.fields["pfil"] = encoding.EncodeUTF16(path, false)
+}
+
+func (dmf *DatabaseMusicFile) DeepCopy() DatabaseMusicFile {
+	var newDMF DatabaseMusicFile
+
+	newDMF.otrk = make([]byte, len(dmf.otrk))
+	copy(newDMF.otrk, dmf.otrk)
+
+	newDMF.fields = make(map[string][]byte, len(dmf.fields))
+
+	for k, v := range dmf.fields {
+		newDMF.fields[k] = make([]byte, len(v))
+		copy(newDMF.fields[k], v)
+	}
+
+	newDMF.keys = make([]string, 0, len(dmf.keys))
+
+	for _, key := range dmf.keys {
+		newDMF.keys = append(newDMF.keys, key)
+	}
+
+	return newDMF
 }
