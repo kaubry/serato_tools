@@ -15,18 +15,13 @@ import (
 )
 
 const (
-	seratoDirName = "_Serato_"
-)
-
-const (
+	seratoDirName          = "_Serato_"
 	darwinVolumesPrefix    = "/Volumes/"
 	darwinRootVolumePrefix = "/Users/"
 	darwinRootVolume       = "/"
 )
 
-var (
-	ErrInvalidPath = errors.New("invalid path")
-)
+var ErrInvalidPath = errors.New("invalid path")
 
 type homeDirGetter interface {
 	getHomeDir() string
@@ -43,19 +38,6 @@ func (_ localHomeDirGetter) getHomeDir() string {
 var (
 	defaultHomeDirGetter homeDirGetter = localHomeDirGetter{}
 )
-
-func GetDarwinVolume(path string) string {
-	if strings.HasPrefix(path, darwinVolumesPrefix) {
-		pathSplit := strings.Split(path, string(os.PathSeparator))
-		return string(os.PathSeparator) + filepath.Join(pathSplit[1], pathSplit[2])
-	}
-
-	if len(path) > 0 && string(path[0]) == darwinRootVolume {
-		return darwinRootVolume
-	}
-
-	return ""
-}
 
 type Config struct {
 	MusicPath string
@@ -118,20 +100,15 @@ func removeMusicPathFromPath(file string, c *Config) string {
 }
 
 func RemoveVolumeFromPath(path string) (string, error) {
+	volume := GetVolume(path)
+	if volume == "" {
+		return "", fmt.Errorf("%w '%s'", ErrInvalidPath, path)
+	}
 	if runtime.GOOS == "windows" {
-		volume := filepath.VolumeName(path)
-		if volume == "" {
-			return "", fmt.Errorf("%w '%s'", ErrInvalidPath, path)
-		}
 		return strings.Replace(path, volume+string(os.PathSeparator), "", 1), nil
 	}
 
 	if runtime.GOOS == "darwin" {
-		volume := GetDarwinVolume(path)
-		if volume == "" {
-			return "", fmt.Errorf("%w '%s'", ErrInvalidPath, path)
-		}
-
 		if volume == darwinRootVolume {
 			return path[1:], nil
 		}
@@ -148,21 +125,18 @@ func uniformPathSeparator(path string) string {
 }
 
 func GetSeratoDir(c *Config) (string, error) {
+	volume := GetVolume(c.MusicPath)
+	if volume == "" {
+		return "", fmt.Errorf("%w '%s'", ErrInvalidPath, c.MusicPath)
+	}
 	if runtime.GOOS == "windows" {
-		volume := filepath.VolumeName(c.MusicPath)
 		if volume == "C:" {
 			return filepath.Join(getHomeDir(), seratoDirName), nil
 		}
-
 		return filepath.Join(volume, string(os.PathSeparator)+seratoDirName), nil
 	}
 
 	if runtime.GOOS == "darwin" {
-		volume := GetDarwinVolume(c.MusicPath)
-		if volume == "" {
-			return "", fmt.Errorf("%w '%s'", ErrInvalidPath, c.MusicPath)
-		}
-
 		if volume == darwinRootVolume {
 			return filepath.Join(getHomeDir(), seratoDirName), nil
 		}
@@ -199,13 +173,12 @@ func GetSupportedExtension() set.Interface {
 }
 
 func GetFilePath(path string, seratoDir string) (string, error) {
+	volume := GetVolume(seratoDir)
 	if runtime.GOOS == "windows" {
-		volume := filepath.VolumeName(seratoDir)
 		return filepath.Join(volume, path), nil
 	}
 
 	if runtime.GOOS == "darwin" {
-		volume := GetDarwinVolume(seratoDir)
 		if volume == "" {
 			return "", fmt.Errorf("%w '%s'", ErrInvalidPath, path)
 		}

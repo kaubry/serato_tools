@@ -8,6 +8,11 @@ type TestTable struct {
 	result    string
 }
 
+type pathTestCase struct {
+	path   string
+	result string
+}
+
 func TestGetFilePath(t *testing.T) {
 	defaultHomeDirGetter = stubHomeDirGetter{"/Users/test"}
 
@@ -21,31 +26,13 @@ func TestGetFilePath(t *testing.T) {
 	}
 }
 
-type getDarwinVolumeTestCase struct {
-	path   string
-	result string
-}
-
-func TestGetDarwinVolume(t *testing.T) {
-	for _, test := range []getDarwinVolumeTestCase{
-		{"/Volumes/TestVolume1", "/Volumes/TestVolume1"},
-		{"/Volumes/TestVolume1/", "/Volumes/TestVolume1"},
-		{"/Volumes/Test-Volume1", "/Volumes/Test-Volume1"},
-		{"/Volumes/Test-Volume1/", "/Volumes/Test-Volume1"},
-		{"/Volumes/TestVolume1/example.mp3", "/Volumes/TestVolume1"},
-		{"/Users/test/Desktop/example.mp3", "/"},
-		{"SomeRelativePath/example.mp3", ""},
-	} {
-		result := GetDarwinVolume(test.path)
+func TestGetVolume(t *testing.T) {
+	for _, test := range getVolumeExpect {
+		result := GetVolume(test.path)
 		if result != test.result {
 			t.Errorf("expected '%s', got '%s'", test.result, result)
 		}
 	}
-}
-
-type removeVolumeTestCase struct {
-	path   string
-	result string
 }
 
 func TestRemoveVolumeFromPath(t *testing.T) {
@@ -65,21 +52,10 @@ func (dirGetter stubHomeDirGetter) getHomeDir() string {
 	return dirGetter.homeDir
 }
 
-type getSeratoDirTestCase struct {
-	path   string
-	result string
-}
-
 func TestGetSeratoDir(t *testing.T) {
-	defaultHomeDirGetter = stubHomeDirGetter{"/Users/test/Music"}
+	setHomeDir()
 
-	for _, test := range []getSeratoDirTestCase{
-		{"/Volumes/TestVolume1/Music/example.mp3", "/Volumes/TestVolume1/_Serato_"},
-		{"/Users/test/Desktop/example.mp3", "/Users/test/Music/_Serato_"},
-		{"/", "/Users/test/Music/_Serato_"},
-		{"/SomeDir/example.mp3", "/Users/test/Music/_Serato_"},
-		{"SomeRelativePath/example.mp3", ""},
-	} {
+	for _, test := range seratoDirExpect {
 		result, _ := GetSeratoDir(&Config{MusicPath: test.path})
 		if result != test.result {
 			t.Errorf("expected '%s', got '%s'", test.result, result)
