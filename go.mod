@@ -5,7 +5,6 @@ go 1.16
 require (
 	github.com/bogem/id3v2 v1.2.0 // indirect
 	github.com/dhowden/tag v0.0.0-20200412032933-5d76b8eaae27
-	github.com/kaubry/serato_tools v0.0.0-20200608131437-8329c39b1be3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5 // indirect
