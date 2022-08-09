@@ -1,5 +1,11 @@
 package serato
 
+import (
+	"os"
+	"path/filepath"
+	"strings"
+)
+
 func GetVolume(path string) string {
 	if strings.HasPrefix(path, darwinVolumesPrefix) {
 		pathSplit := strings.Split(path, string(os.PathSeparator))
