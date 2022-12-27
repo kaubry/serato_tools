@@ -25,45 +25,45 @@ func init() {
 
 func normalizeFilename(cmd *cobra.Command, args []string) {
 	filepath.WalkDir(directory, func(path string, d os.DirEntry, err error) error {
-		if !d.IsDir() {
-			fileName := d.Name()
+		//if !d.IsDir() {
+		fileName := d.Name()
 
-			normalized := norm.NFC.Bytes([]byte(fileName))
+		normalized := norm.NFC.Bytes([]byte(fileName))
 
-			if string(normalized) != fileName {
+		if string(normalized) != fileName {
 
-				fmt.Printf("%s needs to be normalized", path)
-				fmt.Printf("\n")
+			fmt.Printf("%s needs to be normalized", path)
+			fmt.Printf("\n")
 
-				fmt.Printf("normalized string: ")
-				fmt.Printf("%s", normalized)
-				fmt.Printf("\n")
+			fmt.Printf("normalized string: ")
+			fmt.Printf("%s", normalized)
+			fmt.Printf("\n")
 
-				fmt.Printf("quoted normalized string: ")
-				fmt.Printf("%+q", normalized)
-				fmt.Printf("\n")
+			fmt.Printf("quoted normalized string: ")
+			fmt.Printf("%+q", normalized)
+			fmt.Printf("\n")
 
-				fmt.Printf("\n")
+			fmt.Printf("\n")
 
-				oldPath := fmt.Sprintf("%s", path)
-				currentDirectory := filepath.Dir(path)
+			oldPath := fmt.Sprintf("%s", path)
+			currentDirectory := filepath.Dir(path)
 
-				newPath := filepath.Join(currentDirectory, string(normalized))
+			newPath := filepath.Join(currentDirectory, string(normalized))
 
-				fmt.Printf("Old Path: %s: ", oldPath)
-				fmt.Printf("\n")
-				fmt.Printf("New Path: %s: ", newPath)
+			fmt.Printf("Old Path: %s: ", oldPath)
+			fmt.Printf("\n")
+			fmt.Printf("New Path: %s: ", newPath)
 
-				fmt.Printf("\n")
+			fmt.Printf("\n")
 
-				if !dryRun {
-					e := os.Rename(oldPath, newPath)
-					if e != nil {
-						log.Fatal(e)
-					}
+			if !dryRun {
+				e := os.Rename(oldPath, newPath)
+				if e != nil {
+					log.Fatal(e)
 				}
 			}
 		}
+		//}
 		return nil
 	})
 }

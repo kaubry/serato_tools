@@ -39,10 +39,11 @@ func cleanCrates(cmd *cobra.Command, args []string) {
 			logger.Logger.Info("Reading crate", zap.String("crate", c))
 			f, _ := os.Open(c)
 			crate, err := serato.NewCrate(f)
-      if err != nil {
-			logger.Logger.Error("Could not read create", zap.Error(err))
-			return
-		}
+			if err != nil {
+				logger.Logger.Error("Could not read create", zap.Error(err))
+				continue
+				//return
+			}
 			before := crate.NumberOfTracks()
 			cleanCrate(crate)
 			if before != crate.NumberOfTracks() {
