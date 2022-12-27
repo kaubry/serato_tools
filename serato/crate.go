@@ -258,3 +258,5 @@ func (c *Crate) getTvcn() string {
 	s, _ := encoding.DecodeUTF16(c.tvcn)
 	return s
 }
+
+func (c *Crate) GetColumns() []Column { return c.columns }

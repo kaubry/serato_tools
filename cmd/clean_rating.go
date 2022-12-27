@@ -34,7 +34,7 @@ func cleanRatings(cmd *cobra.Command, args []string) {
 		for _, file := range files {
 			tag, err := id3v2.Open(file, id3v2.Options{Parse: true})
 			if err != nil {
-				log.Printf("Error while opening mp3 file: ", err, file)
+				log.Printf("Error while opening mp3 file: %s \n %v", file, err)
 			}
 			if tag != nil {
 				defer tag.Close()
@@ -57,5 +57,5 @@ func cleanRatings(cmd *cobra.Command, args []string) {
 }
 
 func startWithBom(text []byte) bool {
-	return  len(text) > 3 && text[0] == 239 && text[1] == 187 && text[2] == 191
+	return len(text) > 3 && text[0] == 239 && text[1] == 187 && text[2] == 191
 }

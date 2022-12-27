@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/fatih/set.v0"
 )
@@ -91,6 +92,9 @@ func ReadBytesWithOffset(f *os.File, offset int64, length int64) ([]byte, error)
 func ListFiles(dir string, supporterExtension set.Interface) map[string][]string {
 	output := make(map[string][]string)
 	filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
+		if isHiddenFile(f.Name()) {
+			return nil
+		}
 		if f.IsDir() {
 			if output[path] == nil {
 				output[path] = []string{}
@@ -107,4 +111,8 @@ func ListFiles(dir string, supporterExtension set.Interface) map[string][]string
 	})
 
 	return output
+}
+
+func isHiddenFile(fileName string) bool {
+	return strings.HasPrefix(fileName, ".")
 }
