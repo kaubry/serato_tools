@@ -44,6 +44,22 @@ func TestRemoveVolumeFromPath(t *testing.T) {
 	}
 }
 
+func TestRemoveMusicPathFromPath(t *testing.T) {
+	file := "/home/user/music/song.mp3"
+	expected := "song.mp3"
+
+	// Create a sample Config
+	config := &Config{
+		MusicPath: "/home/user/music/",
+	}
+
+	result := removeMusicPathFromPath(file, config)
+
+	if result != expected {
+		t.Errorf("Expected: %s, but got: %s", expected, result)
+	}
+}
+
 type stubHomeDirGetter struct {
 	homeDir string
 }
