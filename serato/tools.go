@@ -3,41 +3,16 @@ package serato
 import (
 	"errors"
 	"fmt"
+	"gopkg.in/fatih/set.v0"
 	"os"
-	"os/user"
 	"path/filepath"
 	"runtime"
 	"strings"
 
 	"github.com/kaubry/serato_tools/files"
-
-	"gopkg.in/fatih/set.v0"
-)
-
-const (
-	seratoDirName          = "_Serato_"
-	darwinVolumesPrefix    = "/Volumes/"
-	darwinRootVolumePrefix = "/Users/"
-	darwinRootVolume       = "/"
 )
 
 var ErrInvalidPath = errors.New("invalid path")
-
-type homeDirGetter interface {
-	getHomeDir() string
-}
-
-type localHomeDirGetter struct {
-}
-
-func (_ localHomeDirGetter) getHomeDir() string {
-	usr, _ := user.Current()
-	return filepath.Join(usr.HomeDir, "Music")
-}
-
-var (
-	defaultHomeDirGetter homeDirGetter = localHomeDirGetter{}
-)
 
 type Config struct {
 	MusicPath string
@@ -49,17 +24,11 @@ func CreateCrates(files map[string][]string, c *Config) {
 	for key, tracks := range files {
 		cratePath := getCratePath(key, c)
 		createCrate(cratePath, GetDefaultColumn(), c, tracks...)
-		//info, err := os.Stat(crateFilePath)
-		//crateFile, err := os.Create()
-		//if err != nil {
-		//	log.Printf("Can't create file %s", file)
-		//}
-
 	}
 }
 
 func ensureDirectories(c *Config) {
-	path, err := GetSubcrateFolder(c)
+	path, err := GetSubcrateFolder(c, FolderTool{})
 	check(err)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		e := os.MkdirAll(path, os.ModePerm)
@@ -70,10 +39,6 @@ func ensureDirectories(c *Config) {
 func createCrate(path string, columns []ColumnName, c *Config, tracks ...string) {
 	crate := NewEmptyCrate(columns)
 	for _, t := range tracks {
-		//f, err := os.Open(t)
-		//if err != nil {
-		//	log.Printf("File %s is not a track", t)
-		//}
 		trackPath, err := RemoveVolumeFromPath(t)
 		check(err)
 		trackPath = uniformPathSeparator(trackPath)
@@ -83,7 +48,7 @@ func createCrate(path string, columns []ColumnName, c *Config, tracks ...string)
 }
 
 func getCratePath(file string, c *Config) string {
-	subcrateFolder, err := GetSubcrateFolder(c)
+	subcrateFolder, err := GetSubcrateFolder(c, FolderTool{})
 	check(err)
 	newPath := removeMusicPathFromPath(file, c)
 	newPath = strings.Replace(newPath, string(os.PathSeparator), "%%", -1)
@@ -92,7 +57,6 @@ func getCratePath(file string, c *Config) string {
 		newPath = c.RootCrate + newPath
 	}
 	return filepath.Join(subcrateFolder, newPath+".crate")
-	//return ""
 }
 
 func removeMusicPathFromPath(file string, c *Config) string {
@@ -124,35 +88,8 @@ func uniformPathSeparator(path string) string {
 	return strings.Replace(path, string(os.PathSeparator), "/", -1)
 }
 
-func GetSeratoDir(c *Config) (string, error) {
-	volume := GetVolume(c.MusicPath)
-	if volume == "" {
-		return "", fmt.Errorf("%w '%s'", ErrInvalidPath, c.MusicPath)
-	}
-	if runtime.GOOS == "windows" {
-		if volume == "C:" {
-			return filepath.Join(getHomeDir(), seratoDirName), nil
-		}
-		return filepath.Join(volume, string(os.PathSeparator)+seratoDirName), nil
-	}
-
-	if runtime.GOOS == "darwin" {
-		if volume == darwinRootVolume {
-			return filepath.Join(getHomeDir(), seratoDirName), nil
-		}
-
-		return filepath.Join(volume, seratoDirName), nil
-	}
-
-	return "", errors.New("OS not supported")
-}
-
-func getHomeDir() string {
-	return defaultHomeDirGetter.getHomeDir()
-}
-
-func GetSubcrateFolder(c *Config) (string, error) {
-	s, err := GetSeratoDir(c)
+func GetSubcrateFolder(c *Config, sdg SeratoDirGetter) (string, error) {
+	s, err := sdg.GetSeratoDir(c, FolderTool{})
 	if err != nil {
 		return "", err
 	}

@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+const (
+	darwinRootVolume    = "/"
+	darwinVolumesPrefix = "/Volumes/"
+)
+
 func GetVolume(path string) string {
 	if strings.HasPrefix(path, darwinVolumesPrefix) {
 		pathSplit := strings.Split(path, string(os.PathSeparator))

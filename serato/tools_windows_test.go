@@ -7,9 +7,9 @@ func getTableForFilePathTest() []TestTable {
 	return tables
 }
 
-func setHomeDir() {
-	defaultHomeDirGetter = stubHomeDirGetter{"C:\\Users\\TestUser\\Music"}
-}
+//func setHomeDir() {
+//	defaultHomeDirGetter = stubHomeDirGetter{"C:\\Users\\TestUser\\Music"}
+//}
 
 var removeVolumeTestCaseExpect = []pathTestCase{
 	{"C:\\example.mp3", "example.mp3"},

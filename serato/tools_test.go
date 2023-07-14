@@ -1,6 +1,8 @@
 package serato
 
-import "testing"
+import (
+	"testing"
+)
 
 type TestTable struct {
 	path      string
@@ -14,7 +16,6 @@ type pathTestCase struct {
 }
 
 func TestGetFilePath(t *testing.T) {
-	defaultHomeDirGetter = stubHomeDirGetter{"/Users/test"}
 
 	for _, table := range getTableForFilePathTest() {
 		s, e := GetFilePath(table.path, table.seratoDir)
@@ -60,21 +61,33 @@ func TestRemoveMusicPathFromPath(t *testing.T) {
 	}
 }
 
-type stubHomeDirGetter struct {
-	homeDir string
+type MockSeratoDirGetter struct {
+	Result string
+	Err    error
 }
 
-func (dirGetter stubHomeDirGetter) getHomeDir() string {
-	return dirGetter.homeDir
+func (m MockSeratoDirGetter) GetSeratoDir(c *Config, hdg HomeDirGetter) (string, error) {
+	return m.Result, m.Err
 }
 
-func TestGetSeratoDir(t *testing.T) {
-	setHomeDir()
+func TestGetSubcrateFolder(t *testing.T) {
+	config := Config{
+		MusicPath: "/path/to/music",
+		RootCrate: "Root",
+	}
 
-	for _, test := range seratoDirExpect {
-		result, _ := GetSeratoDir(&Config{MusicPath: test.path})
-		if result != test.result {
-			t.Errorf("expected '%s', got '%s'", test.result, result)
-		}
+	mockSeratoDirGetter := MockSeratoDirGetter{
+		Result: "/path/to/serato",
+		Err:    nil,
+	}
+
+	subcrateFolder, err := GetSubcrateFolder(&config, mockSeratoDirGetter)
+	if err != nil {
+		t.Errorf("GetSubcrateFolder returned an error: %v", err)
+	}
+
+	expectedSubcrateFolder := "/path/to/serato/Subcrates"
+	if subcrateFolder != expectedSubcrateFolder {
+		t.Errorf("Subcrate folder does not match. Expected: %q, Got: %q", expectedSubcrateFolder, subcrateFolder)
 	}
 }
