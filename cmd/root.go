@@ -14,6 +14,9 @@ var seratoDir string
 var directory string
 var database, dryRun bool
 
+var path string
+var prefFilePath string
+
 var rootCmd = &cobra.Command{
 	Use:   "serato-tools",
 	Short: "Serato Tools is a tool to help you perform tasks on Serato",
