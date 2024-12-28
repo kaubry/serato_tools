@@ -70,7 +70,9 @@ func (d *Database) GetBytes() []byte {
 
 	//MusicFiles
 	for _, dmf := range d.Dmfs {
-		output = append(output, dmf.GetBytes()...)
+		if !dmf.IsRemoved() {
+			output = append(output, dmf.GetBytes()...)
+		}
 	}
 
 	return output

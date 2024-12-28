@@ -5,6 +5,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
+
+	"golang.org/x/text/unicode/norm"
 
 	"github.com/kaubry/serato_tools/encoding"
 	"github.com/kaubry/serato_tools/files"
@@ -14,6 +17,7 @@ type DatabaseMusicFile struct {
 	otrk   []byte //length
 	fields map[string][]byte
 	keys   []string //Keys to keep the order in the fields map
+	removed bool
 }
 
 //ttyp / pfil / tsng / tart / talb / tgen / tlen / tsiz / tbit / tsmp / tbpm / tcom / tgrp / trmx / tlbl / tcmp / ttyr / tadd / tkey / uadd / utkn / ulbl / utme / ufsb / sbav / bhrt / bmis / bply / blop / bitu / bovc / bcrt / biro / bwlb / bwll / buns / bbgl / bkrk /
@@ -105,11 +109,58 @@ func isString(s string) bool {
 }
 
 func (dmf *DatabaseMusicFile) getFilePath() (string, error) {
-	return encoding.DecodeUTF16(dmf.fields["pfil"])
+	path, err := encoding.DecodeUTF16(dmf.fields["pfil"])
+	if err != nil {
+		return "", err
+	}
+	return norm.NFC.String(path), nil
+}
+
+func (dmf *DatabaseMusicFile) GetFilePath() (string, error) {
+	return dmf.getFilePath()
+}
+
+func (dmf *DatabaseMusicFile) GetFilePathByteArray() []byte {
+	return dmf.fields["pfil"]
+}
+
+func (dmf *DatabaseMusicFile) GetFilePathAddedDate() []byte {
+	return dmf.fields["tadd"]
+}
+
+func (dmf *DatabaseMusicFile) GetFilePathAddedDateTime() (time.Time, error) {
+	taddBytes := dmf.GetFilePathAddedDate()
+	if taddBytes == nil {
+		return time.Time{}, nil
+	}
+	
+	// Decode UTF-16 bytes to string
+	taddStr, err := encoding.DecodeUTF16(taddBytes)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	// Convert string to int64
+	timestamp, err := strconv.ParseInt(taddStr, 10, 64)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	// Convert Unix timestamp to time.Time
+	return time.Unix(timestamp, 0), nil
 }
 
 func (dmf *DatabaseMusicFile) SetFilePath(path string) {
-	dmf.fields["pfil"] = encoding.EncodeUTF16(path, false)
+	normalizedPath := norm.NFC.String(path)
+	dmf.fields["pfil"] = encoding.EncodeUTF16(normalizedPath, false)
+}
+
+func (dmf *DatabaseMusicFile) RemoveFromDatabase() {
+	dmf.removed = true
+}
+
+func (dmf *DatabaseMusicFile) IsRemoved() bool {
+	return dmf.removed
 }
 
 func (dmf *DatabaseMusicFile) DeepCopy() DatabaseMusicFile {
@@ -130,6 +181,8 @@ func (dmf *DatabaseMusicFile) DeepCopy() DatabaseMusicFile {
 	for _, key := range dmf.keys {
 		newDMF.keys = append(newDMF.keys, key)
 	}
+
+	newDMF.removed = dmf.removed
 
 	return newDMF
 }
