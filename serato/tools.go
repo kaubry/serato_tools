@@ -119,7 +119,7 @@ func RemoveVolumeFromPath(path string) (string, error) {
 	return "", errors.New("OS not supported")
 }
 
-//Serato uses "/" as path separator and not the default OS. Needs to change to work between OS X and Windows
+// Serato uses "/" as path separator and not the default OS. Needs to change to work between OS X and Windows
 func uniformPathSeparator(path string) string {
 	return strings.Replace(path, string(os.PathSeparator), "/", -1)
 }

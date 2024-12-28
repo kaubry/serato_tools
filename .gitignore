@@ -13,3 +13,6 @@
 vendor
 .idea
 *.iml
+
+serato_tools
+.vscode
