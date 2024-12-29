@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"golang.org/x/text/unicode/norm"
 
 	"github.com/kaubry/serato_tools/files"
 
@@ -77,6 +78,7 @@ func createCrate(path string, columns []ColumnName, c *Config, tracks ...string)
 		trackPath, err := RemoveVolumeFromPath(t)
 		check(err)
 		trackPath = uniformPathSeparator(trackPath)
+		trackPath = norm.NFC.String(trackPath)
 		crate.AddTrack(trackPath)
 	}
 	files.WriteToFile(path, crate.GetCrateBytes())
