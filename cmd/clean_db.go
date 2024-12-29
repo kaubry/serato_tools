@@ -259,6 +259,11 @@ func cleanDuplicates(cmd *cobra.Command, args []string) {
 								keepFields = append(keepFields, zap.String("added_time", addedTime.String()))
 							}
 							logger.Logger.Info("Would keep entry (oldest)", keepFields...)
+						} else {
+							// Normalize the path of the entry we're keeping to ensure NFC form
+							db.Dmfs[entry.index].SetFilePath(entry.normalizedPath)
+							logger.Logger.Debug("Normalized path of kept entry",
+								zap.String("path", entry.normalizedPath))
 						}
 					}
 				} else {

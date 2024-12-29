@@ -14,9 +14,9 @@ import (
 )
 
 type DatabaseMusicFile struct {
-	otrk   []byte //length
-	fields map[string][]byte
-	keys   []string //Keys to keep the order in the fields map
+	otrk    []byte //length
+	fields  map[string][]byte
+	keys    []string //Keys to keep the order in the fields map
 	removed bool
 }
 
@@ -133,7 +133,7 @@ func (dmf *DatabaseMusicFile) GetFilePathAddedDateTime() (time.Time, error) {
 	if taddBytes == nil {
 		return time.Time{}, nil
 	}
-	
+
 	// Decode UTF-16 bytes to string
 	taddStr, err := encoding.DecodeUTF16(taddBytes)
 	if err != nil {
