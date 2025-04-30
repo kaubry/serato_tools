@@ -3,12 +3,15 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/kaubry/serato_tools/logger"
 	"github.com/kaubry/serato_tools/serato"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
+)
+
+const (
+	databaseFileName = "database V2"
 )
 
 var fdbCommand = &cobra.Command{
@@ -17,9 +20,20 @@ var fdbCommand = &cobra.Command{
 	Run:   findDatabaseDuplicate,
 }
 
+//var musicDir string
+
 func init() {
 	fdbCommand.Flags().StringVarP(&musicDir, "dir", "d", "", "Root directory for your music")
 	rootCmd.AddCommand(fdbCommand)
+}
+
+// handleErr logs the error and returns whether to continue execution
+func handleErr(err error, message string) bool {
+	if err != nil {
+		logger.Logger.Error(message, zap.Error(err))
+		return false // Stop execution
+	}
+	return true // Continue execution
 }
 
 func findDatabaseDuplicate(cmd *cobra.Command, args []string) {
@@ -27,24 +41,25 @@ func findDatabaseDuplicate(cmd *cobra.Command, args []string) {
 		MusicPath: musicDir,
 	}
 
-	// Get the database file path
+	// Get the Serato directory
 	seratoDir, err := serato.GetSeratoDir(config)
-	if err != nil {
-		logger.Logger.Error("Error getting Serato directory", zap.Error(err))
+	if !handleErr(err, "Error getting Serato directory") {
 		return
 	}
 
-	// Open and read database
-	dbFile, err := os.Open(seratoDir + string(os.PathSeparator) + "database V2")
-	if err != nil {
-		logger.Logger.Error("Error opening database file", zap.Error(err))
+	// Construct the database file path
+	dbPath := seratoDir + string(os.PathSeparator) + databaseFileName
+
+	// Open the database file
+	dbFile, err := os.Open(dbPath)
+	if !handleErr(err, fmt.Sprintf("Error opening database file: %s", dbPath)) {
 		return
 	}
 	defer dbFile.Close()
 
+	// Read the database
 	db, err := serato.NewDatabase(dbFile)
-	if err != nil {
-		logger.Logger.Error("Error reading database", zap.Error(err))
+	if !handleErr(err, "Error reading database") {
 		return
 	}
 
@@ -54,14 +69,7 @@ func findDatabaseDuplicate(cmd *cobra.Command, args []string) {
 	// Find duplicates
 	for i, dmf := range db.Dmfs {
 		path, err := dmf.GetFilePath()
-		if strings.Contains(path, "El Secreto") {
-			fmt.Printf("Path: %s\n", path)
-			fmt.Printf("Byte array: %v\n", dmf.GetFilePathByteArray())
-			fmt.Printf("Added date: %v\n", dmf.GetFilePathAddedDate())
-
-		}
-		if err != nil {
-			logger.Logger.Error("Error getting file path", zap.Error(err))
+		if !handleErr(err, "Error getting file path") {
 			continue
 		}
 		pathCount[path] = append(pathCount[path], i)
